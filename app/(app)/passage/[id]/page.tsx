@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { usePassage } from "@/hooks/passages/use-passage";
 import { useGenerateQuestions } from "@/hooks/questions/use-generate-questions";
+import { useSaveQuestionSet } from "@/hooks/questions/use-save-question-set";
 import { GenerationSettings } from "@/components/generation/generation-settings";
 import { GenerationLoader } from "@/components/generation/generation-loader";
 import { ValidationScreen } from "@/components/generation/validation-screen";
 import type { GenerationSettings as GenerationSettingsType, Question } from "@/types/question";
-import { FiLoader, FiAlertCircle, FiChevronLeft, FiSave, FiEdit2 } from "react-icons/fi";
+import { FiLoader, FiAlertCircle, FiChevronLeft, FiSave, FiEdit2, FiCheckCircle } from "react-icons/fi";
 
 type WorkflowPhase = 'input' | 'generating' | 'results';
 
@@ -18,6 +19,7 @@ export default function PassageDetailPage() {
   const passageId = params?.id as string;
   const { passage, loading, error } = usePassage(passageId);
   const { generateQuestions, isGenerating, error: generateError } = useGenerateQuestions();
+  const { saveQuestionSet, loading: isSaving, error: saveError } = useSaveQuestionSet();
 
   // Workflow state
   const [phase, setPhase] = useState<WorkflowPhase>('input');
@@ -28,6 +30,7 @@ export default function PassageDetailPage() {
   });
   const [questions, setQuestions] = useState<Question[]>([]);
   const [regeneratingQuestionId, setRegeneratingQuestionId] = useState<string | null>(null);
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
   const handleGenerate = async () => {
     if (!passage) return;
@@ -59,9 +62,39 @@ export default function PassageDetailPage() {
     setQuestions([]);
   };
 
-  const handleSave = () => {
-    // TODO: Implement save to database in next phase
-    alert('Save functionality will be implemented in the next phase!');
+  const handleSave = async () => {
+    if (!passage) return;
+
+    try {
+      const questionSet = await saveQuestionSet({
+        passage_id: passage.id,
+        difficulty: settings.difficulty,
+        question_count: settings.questionCount,
+        question_types: settings.questionTypes,
+        payload: {
+          questions,
+          meta: {
+            grade_level: passage.grade_level,
+            difficulty: settings.difficulty,
+            question_types: settings.questionTypes,
+            question_count: settings.questionCount,
+          },
+        },
+      });
+
+      if (questionSet) {
+        // Show success message
+        setShowSaveSuccess(true);
+        setTimeout(() => {
+          setShowSaveSuccess(false);
+          // Navigate to bank page after showing success
+          router.push('/bank');
+        }, 1500);
+      }
+    } catch (err) {
+      console.error('Save failed:', err);
+      alert(`Failed to save question set: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
   };
 
   const handleEdit = () => {
@@ -221,18 +254,36 @@ export default function PassageDetailPage() {
           <div className="flex gap-3">
             <button
               onClick={handleBack}
-              className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 flex items-center gap-2"
+              disabled={isSaving}
+              className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FiChevronLeft className="w-4 h-4" />
               Back
             </button>
-            <button
-              onClick={handleSave}
-              className="px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md flex items-center gap-2"
-            >
-              <FiSave className="w-4 h-4" />
-              Save Question Set
-            </button>
+            {showSaveSuccess ? (
+              <div className="px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-lg shadow-md flex items-center gap-2">
+                <FiCheckCircle className="w-4 h-4" />
+                Saved Successfully!
+              </div>
+            ) : (
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isSaving ? (
+                  <>
+                    <FiLoader className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FiSave className="w-4 h-4" />
+                    Save Question Set
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
 
