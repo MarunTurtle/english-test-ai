@@ -22,7 +22,7 @@ This project is a classroom-ready AI item generator that prioritizes **Teacher C
 - **UI:** Tailwind CSS + shadcn/ui (Radix UI) + lucide-react
 - **Auth:** Supabase Auth + Google OAuth
 - **DB:** Supabase (PostgreSQL)
-- **AI:** OpenAI API (gpt-4o-mini or gpt-3.5-turbo)
+- **AI:** OpenAI API (gpt-5-mini)
 - **Deployment:** Vercel (Automatic CI/CD from GitHub)
 
 ## Getting Started

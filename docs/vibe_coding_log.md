@@ -751,4 +751,144 @@ if (!user) return null;
 - 삭제: `middleware.ts` (충돌 해결)
 - 업데이트: Dashboard, Bank 페이지
 
+## 12. Phase 2: Passage CRUD 구현
+
+### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor Agent)
+
+### 의도 (Intent): Question 생성 워크플로우의 기반이 되는 Passage(지문) CRUD 기능을 구현. 교사가 영어 지문을 생성, 조회, 수정, 삭제할 수 있는 완전한 데이터 관리 시스템을 구축하여 Phase 3 (Question Generation)의 기초를 마련.
+
+### 프롬프트 (Prompt):
+```
+# Task: Implement Passage CRUD (Phase 2 - Core Features) 
+@docs/project_structure.md @docs/edited_project_blueprint.md 
+
+## Goal
+Implement complete CRUD functionality for reading passages, following the architecture 
+defined in @docs/edited_project_blueprint.md and @docs/project_structure.md. 
+This is the foundation for the question generation workflow.
+
+## Requirements
+1. Type Definitions (types/passage.ts)
+2. Validation Schemas (schemas/passage.ts)
+3. Database Queries (lib/db/queries/passages.ts)
+4. API Routes (passages/route.ts and [id]/route.ts)
+5. Custom Hooks (use-passages, use-passage, use-create-passage)
+6. UI Components (passage-card, passage-list, passage-form)
+7. Pages (dashboard, passage/new)
+
+[... detailed requirements ...]
+```
+
+### 검증 (Verification):
+**생성된 파일 (총 17개):**
+
+**Data Layer (5개):**
+- `lib/constants/grade-levels.ts`: M1/M2/M3 상수 및 타입
+- `types/passage.ts`: Passage, CreatePassageInput, UpdatePassageInput 타입
+- `schemas/passage.ts`: Zod 스키마 (create/update 검증)
+- `lib/db/queries/passages.ts`: 5개 query 함수 (CRUD + list)
+- `app/api/passages/route.ts` + `[id]/route.ts`: RESTful API 엔드포인트
+
+**Hooks (3개):**
+- `hooks/passages/use-passages.ts`: 전체 목록 조회
+- `hooks/passages/use-passage.ts`: 단일 passage 조회
+- `hooks/passages/use-create-passage.ts`: 생성 mutation
+
+**UI Components (5개):**
+- `components/passages/passage-card.tsx`: 카드 UI (view/delete 액션)
+- `components/passages/passage-list.tsx`: 그리드 레이아웃 + 로딩/에러/empty state
+- `components/passages/passage-form.tsx`: 생성 폼 (100-10,000자 검증, 학년 선택)
+- `components/shared/empty-state.tsx`: 재사용 가능한 빈 상태 컴포넌트
+- `components/shared/difficulty-badge.tsx`: 난이도 뱃지
+
+**Pages (3개):**
+- `app/(app)/dashboard/page.tsx`: PassageList 통합
+- `app/(app)/passage/new/page.tsx`: 생성 페이지
+- `app/(app)/passage/[id]/page.tsx`: 상세 보기 (Phase 3 준비 완료)
+
+**기능 검증:**
+- ✅ Passage 생성: 100자 이상 필수, 제목 자동 생성 (첫 50자)
+- ✅ Passage 목록: 그리드 레이아웃, 최신순 정렬
+- ✅ Passage 삭제: 확인 다이얼로그 + 즉시 UI 업데이트
+- ✅ 상세 보기: 전체 내용 표시 + Phase 3 안내
+- ✅ RLS 보안: user_id 기반 소유권 검증
+- ✅ Validation: Zod 스키마로 입력 검증
+- ✅ Loading states: 스켈레톤 UI
+- ✅ Error handling: 재시도 옵션 포함
+
+**프로토타입 디자인 준수:**
+- Slate 색상 스킴 (slate-50, slate-100, slate-600, slate-800)
+- Blue 액센트 (blue-600 CTA 버튼)
+- react-icons 사용 (FiFileText, FiEye, FiTrash2, FiCalendar)
+- 반응형 그리드 (md:grid-cols-2 lg:grid-cols-3)
+- 문자 카운터 (빨강: 부족/초과, 회색: 정상)
+
+**No linter errors** - 모든 TypeScript/ESLint 검증 통과
+
+### 수정 (Refinement):
+**Zod 패키지 설치:**
+- `npm install zod` 실행 (이미 package-lock.json에 존재, 업데이트 불필요)
+- Validation 스키마에서 사용
+
+**Passage Detail Page 추가:**
+- 원래 계획에 없었으나 UX 개선을 위해 추가
+- 생성 후 리디렉트 대상 필요
+- Phase 3 워크벤치로 전환될 placeholder 역할
+- 현재는 passage 내용 표시 + "Question generation will be implemented in Phase 3" 안내
+
+**Auto-title Generation:**
+- 사용자가 title을 입력하지 않으면 content 첫 50자에서 자동 생성
+- `createPassage` query 함수에서 처리
+- 사용자 경험 개선 (선택적 입력)
+
+**Character Validation:**
+- 최소: 100자 (의미 있는 지문 보장)
+- 최대: 10,000자 (DB 제약 + UX)
+- 실시간 카운터 표시 (빨강/회색 색상 변화)
+- 제출 버튼 비활성화 (조건 미충족 시)
+
+**Delete 확인:**
+- `window.confirm` 다이얼로그로 실수 방지
+- API 호출 실패 시 `alert`로 에러 표시
+- 성공 시 `onDelete` 콜백으로 목록 새로고침
+
+**Next Steps:**
+- Phase 3: Question Generation API 통합
+- Workbench UI (Input → Generate → Review)
+- Question display components
+- Save/load question sets
+
+## 13. Generation API (OpenAI integration)
+
+### 사용 모델 (Model): GPT-5 (Codex CLI) / OpenAI gpt-5-mini (API)
+
+### 의도 (Intent): 서버 전용 `/api/generate` 라우트를 구현해 OpenAI(gpt-5-mini) 호출 → JSON 응답 검증(Zod) → 클라이언트로 안전하게 반환하는 흐름 구축.
+
+### 프롬프트 (Prompt):
+```
+## Feature: Generation API (OpenAI integration)
+- Intent: Build the server-side /api/generate endpoint that calls OpenAI (gpt-5-mini), returns strict JSON, and validates with Zod before sending to the client.
+- Prompt: Implement Phase 2 Step 2 (Generation API). Create a Next.js route handler at app/api/generate/route.ts that is server-only and requires an authenticated Supabase session. Accept a JSON body with passageId plus generation settings (gradeLevel, difficulty, count, questionTypes), validate input with a Zod schema (create schemas/generation-request.ts if missing). Fetch the passage from the database (use existing lib/db/queries/passages.ts or create a simple query if needed). Call OpenAI using gpt-5-mini with response_format: { type: "json_object" }. Put the system and user prompts in lib/ai/prompts.ts; the system prompt must enforce JSON-only output and require evidence quotes (verbatim passage text) for each question. Define a Zod schema for the AI response in lib/ai/validation.ts (or schemas/question.ts) with fields: type, difficulty, question_text, options[4], correct_answer (0-3), evidence, validation_status (PASS|NEEDS_FIX), validation_note. Parse and validate the response; on validation failure return 400 with a clear error payload. On success return the validated JSON. Ensure OPENAI_API_KEY stays server-side and is read from process.env. Use TypeScript strict typing and keep errors readable.
+- Verification: Hit POST /api/generate with a real passageId and settings; confirm it returns a JSON object matching the schema and includes evidence quotes. Also confirm unauthenticated requests return 401 and invalid inputs return 400.
+- Refinement: If the model output fails schema validation, tighten the system prompt or add explicit JSON shape examples in the user prompt, then retry.
+```
+
+### 검증 (Verification):
+- 코드 작성 및 타입 확인 완료
+- 실제 API 호출 테스트는 아직 수행하지 않음
+
+### 수정 (Refinement):
+**구현 파일 추가/업데이트:**
+- `app/api/generate/route.ts`: 인증 + passage 조회 + OpenAI 호출 + JSON 파싱/검증 + 에러 처리
+- `lib/ai/openai.ts`: Responses API 호출 유틸 + JSON 텍스트 추출
+- `lib/ai/prompts.ts`: 시스템/유저 프롬프트 템플릿 (JSON-only + evidence 규칙)
+- `lib/ai/validation.ts`: 응답 스키마 (questions + meta)
+- `schemas/generation-request.ts`: 요청 스키마
+- `schemas/question.ts`: 질문 항목 스키마
+- `lib/constants/difficulty.ts`: 난이도 상수/타입
+- `lib/constants/question-types.ts`: 유형 상수/타입
+
+**추가 규칙 적용:**
+- `response_format: { type: "json_object" }` 강제
+- question_count 및 meta 설정값 불일치 시 400 반환
 
