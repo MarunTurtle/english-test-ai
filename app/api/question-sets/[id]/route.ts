@@ -4,6 +4,11 @@ import {
   getQuestionSetById, 
   deleteQuestionSet 
 } from '@/lib/db/queries/question-sets';
+import { 
+  createErrorResponse, 
+  ErrorCode, 
+  formatErrorForLog 
+} from '@/lib/utils/error-handler';
 
 /**
  * GET /api/question-sets/[id]
@@ -17,8 +22,12 @@ export async function GET(
     const user = await getUser();
 
     if (!user) {
+      console.error('[Question Set API] Unauthorized access attempt');
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        createErrorResponse(
+          'Unauthorized',
+          ErrorCode.UNAUTHORIZED
+        ),
         { status: 401 }
       );
     }
@@ -27,17 +36,26 @@ export async function GET(
     const questionSet = await getQuestionSetById(id, user.id);
 
     if (!questionSet) {
+      console.error(`[Question Set API] Question set not found: ${id}`);
       return NextResponse.json(
-        { error: 'Question set not found' },
+        createErrorResponse(
+          'Question set not found',
+          ErrorCode.NOT_FOUND
+        ),
         { status: 404 }
       );
     }
 
     return NextResponse.json({ questionSet });
   } catch (error) {
-    console.error('Error fetching question set:', error);
+    console.error('[Question Set API] Error fetching question set:', formatErrorForLog(error));
     return NextResponse.json(
-      { error: 'Failed to fetch question set' },
+      createErrorResponse(
+        'Failed to fetch question set',
+        ErrorCode.DATABASE_ERROR,
+        undefined,
+        'Unable to load question set. Please try again later.'
+      ),
       { status: 500 }
     );
   }
@@ -55,8 +73,12 @@ export async function DELETE(
     const user = await getUser();
 
     if (!user) {
+      console.error('[Question Set API] Unauthorized delete attempt');
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        createErrorResponse(
+          'Unauthorized',
+          ErrorCode.UNAUTHORIZED
+        ),
         { status: 401 }
       );
     }
@@ -64,11 +86,17 @@ export async function DELETE(
     const { id } = await params;
     await deleteQuestionSet(id, user.id);
 
+    console.log(`[Question Set API] Deleted question set ${id}`);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting question set:', error);
+    console.error('[Question Set API] Error deleting question set:', formatErrorForLog(error));
     return NextResponse.json(
-      { error: 'Failed to delete question set' },
+      createErrorResponse(
+        'Failed to delete question set',
+        ErrorCode.DATABASE_ERROR,
+        undefined,
+        'Unable to delete question set. Please try again later.'
+      ),
       { status: 500 }
     );
   }

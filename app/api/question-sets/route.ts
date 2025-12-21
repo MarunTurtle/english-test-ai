@@ -3,6 +3,11 @@ import { getUser } from '@/lib/supabase/server';
 import { getQuestionSets, createQuestionSet } from '@/lib/db/queries/question-sets';
 import { createQuestionSetSchema } from '@/schemas/question-set';
 import type { CreateQuestionSetInput } from '@/types';
+import { 
+  createErrorResponse, 
+  ErrorCode, 
+  formatErrorForLog 
+} from '@/lib/utils/error-handler';
 
 /**
  * GET /api/question-sets
@@ -15,8 +20,12 @@ export async function GET(request: NextRequest) {
     const user = await getUser();
 
     if (!user) {
+      console.error('[Question Sets API] Unauthorized access attempt');
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        createErrorResponse(
+          'Unauthorized',
+          ErrorCode.UNAUTHORIZED
+        ),
         { status: 401 }
       );
     }
@@ -28,9 +37,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ questionSets });
   } catch (error) {
-    console.error('Error fetching question sets:', error);
+    console.error('[Question Sets API] Error fetching question sets:', formatErrorForLog(error));
     return NextResponse.json(
-      { error: 'Failed to fetch question sets' },
+      createErrorResponse(
+        'Failed to fetch question sets',
+        ErrorCode.DATABASE_ERROR,
+        undefined,
+        'Unable to load question sets. Please try again later.'
+      ),
       { status: 500 }
     );
   }
@@ -45,8 +59,12 @@ export async function POST(request: NextRequest) {
     const user = await getUser();
 
     if (!user) {
+      console.error('[Question Sets API] Unauthorized create attempt');
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        createErrorResponse(
+          'Unauthorized',
+          ErrorCode.UNAUTHORIZED
+        ),
         { status: 401 }
       );
     }
@@ -57,12 +75,13 @@ export async function POST(request: NextRequest) {
     const validationResult = createQuestionSetSchema.safeParse(body);
 
     if (!validationResult.success) {
-      console.error('Question set validation failed:', validationResult.error.flatten());
+      console.error('[Question Sets API] Validation failed:', validationResult.error.flatten());
       return NextResponse.json(
-        { 
-          error: 'Validation failed', 
-          details: validationResult.error.flatten().fieldErrors 
-        },
+        createErrorResponse(
+          'Validation failed',
+          ErrorCode.VALIDATION_ERROR,
+          validationResult.error.flatten().fieldErrors
+        ),
         { status: 400 }
       );
     }
@@ -70,11 +89,17 @@ export async function POST(request: NextRequest) {
     // Type assertion: Zod schema validates the structure, so we can safely assert the type
     const questionSet = await createQuestionSet(validationResult.data as CreateQuestionSetInput, user.id);
 
+    console.log(`[Question Sets API] Created question set ${questionSet.id}`);
     return NextResponse.json({ questionSet }, { status: 201 });
   } catch (error) {
-    console.error('Error creating question set:', error);
+    console.error('[Question Sets API] Error creating question set:', formatErrorForLog(error));
     return NextResponse.json(
-      { error: 'Failed to create question set' },
+      createErrorResponse(
+        'Failed to create question set',
+        ErrorCode.DATABASE_ERROR,
+        undefined,
+        'Unable to save question set. Please try again later.'
+      ),
       { status: 500 }
     );
   }

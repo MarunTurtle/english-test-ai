@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/lib/supabase/server';
 import { getPassages, createPassage } from '@/lib/db/queries/passages';
 import { createPassageSchema } from '@/schemas/passage';
+import { 
+  createErrorResponse, 
+  ErrorCode, 
+  formatErrorForLog 
+} from '@/lib/utils/error-handler';
 
 /**
  * GET /api/passages
@@ -12,8 +17,12 @@ export async function GET() {
     const user = await getUser();
 
     if (!user) {
+      console.error('[Passages API] Unauthorized access attempt');
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        createErrorResponse(
+          'Unauthorized',
+          ErrorCode.UNAUTHORIZED
+        ),
         { status: 401 }
       );
     }
@@ -22,9 +31,14 @@ export async function GET() {
 
     return NextResponse.json({ passages });
   } catch (error) {
-    console.error('Error fetching passages:', error);
+    console.error('[Passages API] Error fetching passages:', formatErrorForLog(error));
     return NextResponse.json(
-      { error: 'Failed to fetch passages' },
+      createErrorResponse(
+        'Failed to fetch passages',
+        ErrorCode.DATABASE_ERROR,
+        undefined,
+        'Unable to load passages. Please try again later.'
+      ),
       { status: 500 }
     );
   }
@@ -39,8 +53,12 @@ export async function POST(request: NextRequest) {
     const user = await getUser();
 
     if (!user) {
+      console.error('[Passages API] Unauthorized create attempt');
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        createErrorResponse(
+          'Unauthorized',
+          ErrorCode.UNAUTHORIZED
+        ),
         { status: 401 }
       );
     }
@@ -51,22 +69,30 @@ export async function POST(request: NextRequest) {
     const validationResult = createPassageSchema.safeParse(body);
 
     if (!validationResult.success) {
+      console.error('[Passages API] Validation failed:', validationResult.error.flatten());
       return NextResponse.json(
-        { 
-          error: 'Validation failed', 
-          details: validationResult.error.flatten().fieldErrors 
-        },
+        createErrorResponse(
+          'Validation failed',
+          ErrorCode.VALIDATION_ERROR,
+          validationResult.error.flatten().fieldErrors
+        ),
         { status: 400 }
       );
     }
 
     const passage = await createPassage(validationResult.data, user.id);
 
+    console.log(`[Passages API] Created passage ${passage.id}`);
     return NextResponse.json({ passage }, { status: 201 });
   } catch (error) {
-    console.error('Error creating passage:', error);
+    console.error('[Passages API] Error creating passage:', formatErrorForLog(error));
     return NextResponse.json(
-      { error: 'Failed to create passage' },
+      createErrorResponse(
+        'Failed to create passage',
+        ErrorCode.DATABASE_ERROR,
+        undefined,
+        'Unable to create passage. Please try again later.'
+      ),
       { status: 500 }
     );
   }
