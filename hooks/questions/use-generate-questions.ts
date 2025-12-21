@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Question } from '@/types/question';
+import { parseApiError, getUserFriendlyMessage } from '@/lib/utils/error-handler';
 
 interface GenerateQuestionsInput {
   passageId: string;
@@ -15,15 +16,18 @@ interface UseGenerateQuestionsReturn {
   generateQuestions: (input: GenerateQuestionsInput) => Promise<Question[]>;
   isGenerating: boolean;
   error: string | null;
+  retry: () => void;
 }
 
 export function useGenerateQuestions(): UseGenerateQuestionsReturn {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastInput, setLastInput] = useState<GenerateQuestionsInput | null>(null);
 
   const generateQuestions = async (input: GenerateQuestionsInput): Promise<Question[]> => {
     setIsGenerating(true);
     setError(null);
+    setLastInput(input);
 
     try {
       const response = await fetch('/api/generate', {
@@ -42,7 +46,11 @@ export function useGenerateQuestions(): UseGenerateQuestionsReturn {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate questions');
+        const apiError = parseApiError(errorData);
+        
+        // Use user-friendly message from API
+        const errorMessage = apiError.message || getUserFriendlyMessage(apiError.code, apiError.error);
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -50,7 +58,11 @@ export function useGenerateQuestions(): UseGenerateQuestionsReturn {
       // API now returns questions with IDs already included
       return data.questions;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : 'An unexpected error occurred while generating questions';
+      
+      console.error('[useGenerateQuestions] Error:', err);
       setError(errorMessage);
       throw err;
     } finally {
@@ -58,9 +70,17 @@ export function useGenerateQuestions(): UseGenerateQuestionsReturn {
     }
   };
 
+  const retry = () => {
+    if (lastInput) {
+      return generateQuestions(lastInput);
+    }
+    return Promise.resolve([]);
+  };
+
   return {
     generateQuestions,
     isGenerating,
     error,
+    retry,
   };
 }

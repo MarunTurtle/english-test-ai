@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { usePassage } from "@/hooks/passages/use-passage";
 import { useGenerateQuestions } from "@/hooks/questions/use-generate-questions";
@@ -11,6 +11,7 @@ import { ValidationScreen } from "@/components/generation/validation-screen";
 import type { GenerationSettings as GenerationSettingsType, Question } from "@/types/question";
 import { FiLoader, FiAlertCircle, FiChevronLeft, FiSave, FiEdit2, FiCheckCircle } from "react-icons/fi";
 import { useToast } from "@/hooks/shared/use-toast";
+import { useWorkflow } from "@/contexts/workflow-context";
 
 type WorkflowPhase = 'input' | 'generating' | 'results';
 
@@ -18,6 +19,7 @@ export default function PassageDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
+  const { setCurrentStep } = useWorkflow();
   const passageId = params?.id as string;
   const { passage, loading, error } = usePassage(passageId);
   const { generateQuestions, isGenerating, error: generateError } = useGenerateQuestions();
@@ -33,6 +35,22 @@ export default function PassageDetailPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [regeneratingQuestionId, setRegeneratingQuestionId] = useState<string | null>(null);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+
+  // Update workflow indicator based on phase
+  useEffect(() => {
+    if (phase === 'input') {
+      setCurrentStep('input');
+    } else if (phase === 'generating') {
+      setCurrentStep('generate');
+    } else if (phase === 'results') {
+      setCurrentStep('review');
+    }
+    
+    // Cleanup: reset workflow when leaving the page
+    return () => {
+      setCurrentStep(undefined);
+    };
+  }, [phase, setCurrentStep]);
 
   const handleGenerate = async () => {
     if (!passage) return;
@@ -105,6 +123,9 @@ export default function PassageDetailPage() {
       });
 
       if (questionSet) {
+        // Update workflow to save step
+        setCurrentStep('save');
+        
         toast({
           title: 'Question set saved',
           description: 'Your question set has been saved to the Question Bank.',
