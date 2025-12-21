@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { Passage, CreatePassageInput, UpdatePassageInput } from '@/types/passage';
+import { generatePassageTitle } from '@/lib/ai/title-generation';
 
 /**
  * Get all passages for a user
@@ -64,8 +65,18 @@ export async function createPassage(
 ): Promise<Passage> {
   const supabase = await createServerSupabaseClient();
 
-  // Auto-generate title from first 50 chars if not provided
-  const title = data.title || data.content.substring(0, 50).trim() + '...';
+  // Auto-generate title using GPT-4o-mini if not provided
+  let title = data.title?.trim();
+  
+  if (!title) {
+    try {
+      title = await generatePassageTitle(data.content);
+    } catch (error) {
+      console.error('Failed to generate title with GPT, using fallback:', error);
+      // Fallback to first 50 chars if GPT generation fails
+      title = data.content.substring(0, 50).trim() + '...';
+    }
+  }
 
   const { data: passage, error } = await supabase
     .from('passages')
@@ -103,7 +114,39 @@ export async function updatePassage(
   
   if (data.content !== undefined) updateData.content = data.content;
   if (data.grade_level !== undefined) updateData.grade_level = data.grade_level;
-  if (data.title !== undefined) updateData.title = data.title;
+  
+  // Handle title: if empty/undefined and content is being updated, generate new title
+  if (data.title !== undefined) {
+    const titleValue = data.title?.trim();
+    
+    // If title is empty and content is being updated, generate title from new content
+    if (!titleValue && data.content !== undefined) {
+      try {
+        updateData.title = await generatePassageTitle(data.content);
+      } catch (error) {
+        console.error('Failed to generate title with GPT, using fallback:', error);
+        // Fallback to first 50 chars if GPT generation fails
+        updateData.title = data.content.substring(0, 50).trim() + '...';
+      }
+    } else if (titleValue) {
+      // Use provided title
+      updateData.title = titleValue;
+    }
+    // If title is empty string and content is not being updated, don't change title
+  } else if (data.content !== undefined) {
+    // Content is being updated but title is not provided
+    // Check if current title is auto-generated (ends with '...')
+    const currentPassage = await getPassageById(id, userId);
+    if (currentPassage && currentPassage.title.endsWith('...')) {
+      // Regenerate title from new content
+      try {
+        updateData.title = await generatePassageTitle(data.content);
+      } catch (error) {
+        console.error('Failed to generate title with GPT, using fallback:', error);
+        updateData.title = data.content.substring(0, 50).trim() + '...';
+      }
+    }
+  }
 
   const { data: passage, error } = await supabase
     .from('passages')

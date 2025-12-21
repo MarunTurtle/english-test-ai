@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { GenerationSettings } from '@/types/question';
 import { DIFFICULTY_LEVELS } from '@/lib/constants/difficulty';
 import { QUESTION_TYPES } from '@/lib/constants/question-types';
-import { FiSettings, FiChevronRight } from 'react-icons/fi';
+import { FiSettings, FiChevronRight, FiMinus, FiPlus } from 'react-icons/fi';
 
 interface GenerationSettingsProps {
   settings: GenerationSettings;
@@ -32,8 +32,45 @@ export function GenerationSettings({
       ? settings.questionTypes.filter(t => t !== type)
       : [...settings.questionTypes, type];
     
-    onChange({ ...settings, questionTypes: types });
+    const newSettings = { ...settings, questionTypes: types };
+    
+    // Adjust question count if it's below the new minimum
+    const minCount = types.length;
+    const maxCount = 10;
+    if (newSettings.questionCount < minCount) {
+      newSettings.questionCount = minCount;
+    } else if (newSettings.questionCount > maxCount) {
+      newSettings.questionCount = maxCount;
+    }
+    
+    onChange(newSettings);
   };
+
+  // Calculate min and max based on selected question types
+  const minQuestionCount = settings.questionTypes.length || 1;
+  const maxQuestionCount = 10;
+
+  const handleDecrease = () => {
+    if (settings.questionCount > minQuestionCount) {
+      handleQuestionCountChange(settings.questionCount - 1);
+    }
+  };
+
+  const handleIncrease = () => {
+    if (settings.questionCount < maxQuestionCount) {
+      handleQuestionCountChange(settings.questionCount + 1);
+    }
+  };
+
+  // Ensure question count is within valid range when question types change
+  useEffect(() => {
+    if (settings.questionCount < minQuestionCount) {
+      onChange({ ...settings, questionCount: minQuestionCount });
+    } else if (settings.questionCount > maxQuestionCount) {
+      onChange({ ...settings, questionCount: maxQuestionCount });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [minQuestionCount, maxQuestionCount, settings.questionCount]);
 
   const canGenerate = settings.questionTypes.length > 0 && !isGenerating;
 
@@ -71,18 +108,47 @@ export function GenerationSettings({
         <label className="text-xs font-bold text-slate-500 uppercase">
           Number of Questions
         </label>
-        <select
-          value={settings.questionCount}
-          onChange={(e) => handleQuestionCountChange(Number(e.target.value))}
-          className="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          disabled={isGenerating}
-        >
-          {[5, 6, 7, 8, 9, 10].map(num => (
-            <option key={num} value={num}>
-              {num} Questions
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleDecrease}
+            disabled={isGenerating || settings.questionCount <= minQuestionCount}
+            className={`flex items-center justify-center w-10 h-10 rounded border transition-colors ${
+              settings.questionCount <= minQuestionCount || isGenerating
+                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 active:scale-95'
+            }`}
+            aria-label="Decrease question count"
+          >
+            <FiMinus className="w-4 h-4" />
+          </button>
+          
+          <div className="flex-1 text-center">
+            <span className="text-lg font-bold text-slate-800">
+              {settings.questionCount}
+            </span>
+            <span className="text-xs text-slate-500 ml-1">
+              {settings.questionCount === 1 ? 'Question' : 'Questions'}
+            </span>
+          </div>
+          
+          <button
+            type="button"
+            onClick={handleIncrease}
+            disabled={isGenerating || settings.questionCount >= maxQuestionCount}
+            className={`flex items-center justify-center w-10 h-10 rounded border transition-colors ${
+              settings.questionCount >= maxQuestionCount || isGenerating
+                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 active:scale-95'
+            }`}
+            aria-label="Increase question count"
+          >
+            <FiPlus className="w-4 h-4" />
+          </button>
+        </div>
+        <p className="text-xs text-slate-500 text-center">
+          Min: {minQuestionCount} • Max: {maxQuestionCount}
+        </p>
       </div>
 
       {/* Question Types */}

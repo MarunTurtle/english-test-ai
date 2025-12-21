@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/lib/supabase/server';
 import { getQuestionSets, createQuestionSet } from '@/lib/db/queries/question-sets';
 import { createQuestionSetSchema } from '@/schemas/question-set';
+import type { CreateQuestionSetInput } from '@/types';
 
 /**
  * GET /api/question-sets
@@ -65,7 +66,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const questionSet = await createQuestionSet(validationResult.data, user.id);
+    // Type assertion: Zod schema validates the structure, so we can safely assert the type
+    const questionSet = await createQuestionSet(validationResult.data as CreateQuestionSetInput, user.id);
 
     return NextResponse.json({ questionSet }, { status: 201 });
   } catch (error) {
