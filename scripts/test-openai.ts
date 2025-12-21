@@ -42,7 +42,7 @@ async function testOpenAIConnection() {
 
   try {
     console.log('📝 Test Configuration:');
-    console.log('   - Model: gpt-5-mini');
+    console.log('   - Model: gpt-4o-mini');
     console.log('   - Grade Level: M2');
     console.log('   - Difficulty: Medium');
     console.log('   - Question Count: 2');
@@ -66,12 +66,12 @@ async function testOpenAIConnection() {
     const startTime = Date.now();
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-5-mini',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: GENERATION_SYSTEM_PROMPT },
         { role: 'user', content: userPrompt },
       ],
-      // GPT-5 mini only supports temperature: 1 (default)
+      temperature: 0.7,
       response_format: { type: 'json_object' },
     });
 
@@ -107,27 +107,30 @@ async function testOpenAIConnection() {
       console.log(`   - Total Questions: ${parsedJson.questions.length}\n`);
       
       parsedJson.questions.forEach((q: any, index: number) => {
-        console.log(`   Question ${index + 1}:`);
-        console.log(`   - Type: ${q.type || 'N/A'}`);
-        console.log(`   - Difficulty: ${q.difficulty || 'N/A'}`);
+        console.log(`   ━━━ Question ${index + 1} ━━━`);
+        console.log(`   Type: ${q.type || 'N/A'} | Difficulty: ${q.difficulty || 'N/A'}`);
+        console.log(`   Validation: ${q.validation_status || 'N/A'}${q.validation_note ? ` (${q.validation_note})` : ''}`);
+        console.log('');
         
-        if (q.question) {
-          const questionText = String(q.question);
-          console.log(`   - Question: ${questionText.substring(0, 80)}${questionText.length > 80 ? '...' : ''}`);
+        if (q.question_text) {
+          const questionText = String(q.question_text);
+          console.log(`   Q: ${questionText}`);
         }
+        console.log('');
         
         if (q.options && Array.isArray(q.options)) {
-          console.log(`   - Options: ${q.options.length}`);
+          console.log(`   Options:`);
           q.options.forEach((opt: any, i: number) => {
-            console.log(`     ${String.fromCharCode(65 + i)}. ${String(opt).substring(0, 50)}${String(opt).length > 50 ? '...' : ''}`);
+            const isCorrect = i === q.correct_answer;
+            const marker = isCorrect ? '✓' : ' ';
+            console.log(`     ${marker} ${String.fromCharCode(65 + i)}. ${String(opt)}`);
           });
         }
+        console.log('');
         
-        console.log(`   - Correct Answer: ${q.correct_answer || 'N/A'}`);
-        
-        if (q.explanation) {
-          const explText = String(q.explanation);
-          console.log(`   - Explanation: ${explText.substring(0, 60)}${explText.length > 60 ? '...' : ''}`);
+        if (q.evidence) {
+          const evidenceText = String(q.evidence);
+          console.log(`   📝 Evidence: ${evidenceText}`);
         }
         
         console.log('');
