@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     });
 
     const openaiResponse = await createOpenAIResponse({
-      model: 'gpt-5-mini',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: [{ type: 'input_text', text: GENERATION_SYSTEM_PROMPT }] },
         { role: 'user', content: [{ type: 'input_text', text: userPrompt }] },
