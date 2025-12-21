@@ -18,6 +18,7 @@ export function PassageCard({ passage, onDelete }: PassageCardProps) {
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const gradeLabel = GRADE_LEVELS.find(g => g.value === passage.grade_level)?.label || passage.grade_level;
   const contentPreview = passage.content.substring(0, 100) + (passage.content.length > 100 ? '...' : '');
@@ -27,8 +28,35 @@ export function PassageCard({ passage, onDelete }: PassageCardProps) {
     day: 'numeric'
   });
 
-  const handleView = () => {
-    router.push(`/passage/${passage.id}`);
+  const handleView = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch the most recent question set for this passage
+      const response = await fetch(`/api/question-sets?passageId=${passage.id}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const questionSets = data.questionSets || [];
+        
+        // If there's a question set, go to review mode
+        if (questionSets.length > 0) {
+          const latestSet = questionSets[0]; // Already sorted by created_at DESC
+          router.push(`/passage/${passage.id}?questionSetId=${latestSet.id}`);
+        } else {
+          // No question sets yet, go to generate mode
+          router.push(`/passage/${passage.id}`);
+        }
+      } else {
+        // API error, just go to passage page
+        router.push(`/passage/${passage.id}`);
+      }
+    } catch (error) {
+      console.error('Error fetching question sets:', error);
+      // On error, just go to passage page
+      router.push(`/passage/${passage.id}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -74,8 +102,8 @@ export function PassageCard({ passage, onDelete }: PassageCardProps) {
   return (
     <>
     <div 
-      className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-      onClick={handleView}
+      className={`bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow ${isLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+      onClick={isLoading ? undefined : handleView}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-2">
@@ -101,15 +129,19 @@ export function PassageCard({ passage, onDelete }: PassageCardProps) {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={handleView}
-            className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleView();
+            }}
+            disabled={isLoading}
+            className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
             title="View passage"
           >
             <FiEye size={16} />
           </button>
           <button
             onClick={handleDelete}
-            disabled={isDeleting}
+            disabled={isDeleting || isLoading}
             className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
             title="Delete passage"
           >
