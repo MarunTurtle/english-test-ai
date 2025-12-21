@@ -1,6 +1,6 @@
 "use client";
 
-import { FiDatabase, FiPlus, FiHome } from "react-icons/fi";
+import { FiDatabase, FiHome } from "react-icons/fi";
 import { SidebarNavItem } from "./sidebar-nav-item";
 import { WorkflowIndicator } from "./workflow-indicator";
 import { LogoutButton } from "@/components/auth/logout-button";
@@ -29,11 +29,6 @@ export function Sidebar() {
           href={ROUTES.DASHBOARD}
           icon={<FiHome className="w-4 h-4" />}
           label="Dashboard"
-        />
-        <SidebarNavItem
-          href={ROUTES.PASSAGE_NEW}
-          icon={<FiPlus className="w-4 h-4" />}
-          label="Create New Passage"
         />
         <SidebarNavItem
           href={ROUTES.BANK}
