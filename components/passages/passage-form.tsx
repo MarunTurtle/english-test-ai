@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useCreatePassage } from '@/hooks/passages/use-create-passage';
 import { useUpdatePassage } from '@/hooks/passages/use-update-passage';
 import { GRADE_LEVELS, GradeLevel } from '@/lib/constants/grade-levels';
-import { FiAlertCircle, FiLoader } from 'react-icons/fi';
+import { FiAlertCircle } from 'react-icons/fi';
+import { Spinner } from '@/components/shared/spinner';
 import { Passage } from '@/types/passage';
 import { useToast } from '@/hooks/shared/use-toast';
 
@@ -217,7 +218,7 @@ export function PassageForm({ mode = 'create', initialPassage }: PassageFormProp
             >
               {loading ? (
                 <>
-                  <FiLoader className="animate-spin" />
+                  <Spinner size="sm" />
                   {mode === 'create' ? 'Creating...' : 'Updating...'}
                 </>
               ) : (

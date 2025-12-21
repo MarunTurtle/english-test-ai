@@ -8,8 +8,9 @@ import { useSaveQuestionSet } from "@/hooks/questions/use-save-question-set";
 import { GenerationSettings } from "@/components/generation/generation-settings";
 import { GenerationLoader } from "@/components/generation/generation-loader";
 import { ValidationScreen } from "@/components/generation/validation-screen";
+import { Spinner } from "@/components/shared/spinner";
 import type { GenerationSettings as GenerationSettingsType, Question } from "@/types/question";
-import { FiLoader, FiAlertCircle, FiChevronLeft, FiSave, FiEdit2, FiCheckCircle } from "react-icons/fi";
+import { FiAlertCircle, FiChevronLeft, FiSave, FiEdit2, FiCheckCircle } from "react-icons/fi";
 import { useToast } from "@/hooks/shared/use-toast";
 import { useWorkflow } from "@/contexts/workflow-context";
 
@@ -209,7 +210,7 @@ export default function PassageDetailPage() {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <FiLoader className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+          <Spinner size="lg" className="text-blue-600 mx-auto mb-4" />
           <p className="text-slate-600">Loading passage...</p>
         </div>
       </div>
@@ -336,7 +337,7 @@ export default function PassageDetailPage() {
             >
                 {isSaving ? (
                   <>
-                    <FiLoader className="w-4 h-4 animate-spin" />
+                    <Spinner size="sm" />
                     Saving...
                   </>
                 ) : (

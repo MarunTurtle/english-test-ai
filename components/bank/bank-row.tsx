@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import type { QuestionSetWithPassage } from '@/types';
-import { FiFileText, FiTrash2, FiLoader } from 'react-icons/fi';
+import { FiFileText, FiTrash2 } from 'react-icons/fi';
+import { Spinner } from '@/components/shared/spinner';
 
 interface BankRowProps {
   questionSet: QuestionSetWithPassage;
@@ -69,7 +70,7 @@ export function BankRow({ questionSet, onDelete, isDeleting }: BankRowProps) {
           disabled={isDeleting}
         >
           {isDeleting ? (
-            <FiLoader className="w-5 h-5 animate-spin" />
+            <Spinner size="sm" />
           ) : (
             <FiTrash2 className="w-5 h-5" />
           )}

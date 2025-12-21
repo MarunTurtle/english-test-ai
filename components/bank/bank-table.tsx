@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react';
 import { useQuestionSets } from '@/hooks/questions/use-question-sets';
 import { BankRow } from './bank-row';
 import { EmptyState } from '@/components/shared/empty-state';
-import { FiDatabase, FiLoader } from 'react-icons/fi';
+import { SkeletonLoader } from '@/components/shared/skeleton-loader';
+import { AlertDialog } from '@/components/ui/alert-dialog';
+import { FiDatabase } from 'react-icons/fi';
 import { useToast } from '@/hooks/shared/use-toast';
 import type { FilterOptions } from './bank-filters';
 import type { QuestionSetWithPassage } from '@/types';
@@ -17,6 +19,8 @@ export function BankTable({ filters }: BankTableProps) {
   const { questionSets, loading, error, refetch } = useQuestionSets();
   const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [questionSetToDelete, setQuestionSetToDelete] = useState<string | null>(null);
 
   // Apply filters and sorting
   const filteredAndSortedSets = useMemo(() => {
@@ -77,13 +81,16 @@ export function BankTable({ filters }: BankTableProps) {
   }, [questionSets, filters]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this question set?')) {
-      return;
-    }
+    setQuestionSetToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!questionSetToDelete) return;
 
     try {
-      setDeletingId(id);
-      const response = await fetch(`/api/question-sets/${id}`, {
+      setDeletingId(questionSetToDelete);
+      const response = await fetch(`/api/question-sets/${questionSetToDelete}`, {
         method: 'DELETE',
       });
 
@@ -97,6 +104,9 @@ export function BankTable({ filters }: BankTableProps) {
         description: 'The question set has been successfully deleted.',
         variant: 'success',
       });
+
+      setShowDeleteDialog(false);
+      setQuestionSetToDelete(null);
 
       // Refetch the list
       await refetch();
@@ -122,7 +132,16 @@ export function BankTable({ filters }: BankTableProps) {
                 Passage Title
               </th>
               <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                Details
+                Grade
+              </th>
+              <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Difficulty
+              </th>
+              <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Count
+              </th>
+              <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Types
               </th>
               <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
                 Date
@@ -133,14 +152,7 @@ export function BankTable({ filters }: BankTableProps) {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td colSpan={4} className="px-6 py-20 text-center">
-                <div className="flex flex-col items-center gap-3">
-                  <FiLoader className="w-12 h-12 text-slate-400 animate-spin" />
-                  <p className="text-slate-500">Loading question sets...</p>
-                </div>
-              </td>
-            </tr>
+            <SkeletonLoader variant="table-row" count={5} />
           </tbody>
         </table>
       </div>
@@ -278,6 +290,18 @@ export function BankTable({ filters }: BankTableProps) {
           Showing {filteredAndSortedSets.length} of {questionSets.length} question set{questionSets.length !== 1 ? 's' : ''}
         </div>
       )}
+
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete Question Set"
+        description="Are you sure you want to delete this question set? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={handleConfirmDelete}
+        isLoading={deletingId !== null}
+      />
     </div>
   );
 }

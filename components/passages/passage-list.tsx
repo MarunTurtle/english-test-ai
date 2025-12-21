@@ -4,7 +4,8 @@ import React from 'react';
 import { usePassages } from '@/hooks/passages/use-passages';
 import { PassageCard } from './passage-card';
 import { EmptyState } from '@/components/shared/empty-state';
-import { FiFileText, FiLoader } from 'react-icons/fi';
+import { SkeletonLoader } from '@/components/shared/skeleton-loader';
+import { FiFileText } from 'react-icons/fi';
 
 export function PassageList() {
   const { passages, loading, error, refetch } = usePassages();
@@ -12,9 +13,7 @@ export function PassageList() {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-slate-100 rounded-lg h-40 animate-pulse" />
-        ))}
+        <SkeletonLoader variant="card" count={3} />
       </div>
     );
   }

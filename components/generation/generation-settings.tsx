@@ -5,6 +5,7 @@ import type { GenerationSettings } from '@/types/question';
 import { DIFFICULTY_LEVELS } from '@/lib/constants/difficulty';
 import { QUESTION_TYPES } from '@/lib/constants/question-types';
 import { FiSettings, FiChevronRight, FiMinus, FiPlus } from 'react-icons/fi';
+import { Spinner } from '@/components/shared/spinner';
 
 interface GenerationSettingsProps {
   settings: GenerationSettings;
@@ -192,7 +193,7 @@ export function GenerationSettings({
       >
         {isGenerating ? (
           <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <Spinner size="sm" className="text-white" />
             Generating...
           </>
         ) : (
