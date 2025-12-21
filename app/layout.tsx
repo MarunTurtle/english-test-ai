@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "English Question Generator",
-  description: "Generate English questions for language learning",
+  title: "EnglishTestAI - AI-Powered English Test Question Generator",
+  description: "A specialized AI workbench for middle school English teachers to generate high-quality MCQs from reading passages, with evidence-based validation and professional review workflow.",
 };
 
 export default function RootLayout({

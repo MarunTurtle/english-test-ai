@@ -11,7 +11,7 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <Database className="w-6 h-6 text-blue-600" />
           <span className="text-xl font-bold tracking-tight text-slate-900">
-            English Question Generator
+            EnglishTestAI
           </span>
         </div>
       </nav>
@@ -41,7 +41,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-8 text-center text-slate-400 text-sm border-t border-slate-100">
-        © 2025 English Question Generator. All rights reserved.
+        © 2025 EnglishTestAI. All rights reserved.
       </footer>
     </div>
   );

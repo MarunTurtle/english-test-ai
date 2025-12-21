@@ -16,7 +16,7 @@ export function Sidebar() {
       <div className="p-6 border-b border-slate-200">
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <FiDatabase className="w-5 h-5 text-blue-600" />
-          AI Workbench
+          EnglishTestAI
         </h1>
         <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider">
           Teacher Control Panel
