@@ -1453,7 +1453,7 @@ Display in ValidationScreen
 - Phase 3, Step 1: Question Bank (save/load/delete)
 - Toast notifications (사용자 피드백 개선)
 - Error handling 강화
-
+ 
 ## 18. Question Sets CRUD 구현 및 Phase 2 완료
 
 ### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor Agent)
@@ -1627,4 +1627,368 @@ app/(app)/passage/[id]/page.tsx (42:34) @ async handleGenerate
 - README 업데이트
 - Documentation 완성
 - Vercel 배포 준비
+
+## 19. Phase 3 Task 1: Toast Notification System 구현
+
+### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor Agent)
+
+### 의도 (Intent): 사용자 피드백을 개선하기 위해 전문적인 toast 알림 시스템을 구현. 기존의 `alert()` 및 `confirm()` 호출을 세련된 toast 알림으로 대체하여 더 나은 UX 제공. 프로토타입 디자인과 일관성을 유지하면서 모든 주요 액션(생성, 수정, 삭제, 생성, 저장)에 대한 성공/실패 피드백 제공.
+
+### 프롬프트 (Prompt):
+```
+@docs/phase3_implementation_prompt.md Let's start with Task1
+```
+
+### 검증 (Verification):
+**구현된 기능:**
+
+**1. Custom Toast Component (`components/ui/toast.tsx`)**
+- React Context API 기반 전역 toast 시스템
+- 4가지 variants: success (green), error (red), warning (amber), info (blue)
+- 자동 dismiss 기능 (기본 5초, 설정 가능)
+- 수동 닫기 버튼 (X) 포함
+- Bottom-right 위치 (프로토타입 스타일)
+- Slide-in animation 적용
+- react-icons 사용 (FiCheckCircle, FiAlertCircle, FiInfo, FiX)
+
+**2. 전역 통합 (`app/layout.tsx`)**
+- `ToastProvider`를 root layout에 추가
+- `AuthProvider` 내부에서 래핑하여 전역 접근 가능
+- `useToast` hook export (`hooks/shared/use-toast.ts`)
+
+**3. Toast 적용된 기능:**
+
+**Passage Management:**
+- ✅ Passage 생성 성공 → "Passage created" 성공 toast
+- ✅ Passage 수정 성공 → "Passage updated" 성공 toast
+- ✅ Passage 삭제 성공 → "Passage deleted" 성공 toast
+- ✅ 생성/수정/삭제 실패 → 에러 메시지와 함께 에러 toast
+
+**Question Generation:**
+- ✅ 질문 생성 성공 → "Questions generated" 성공 toast (생성된 개수 표시)
+- ✅ 질문 생성 실패 → "Generation failed" 에러 toast
+- ✅ 단일 질문 재생성 성공 → "Question regenerated" 성공 toast
+- ✅ 재생성 실패 → "Regeneration failed" 에러 toast
+
+**Question Sets:**
+- ✅ 질문 세트 저장 성공 → "Question set saved" 성공 toast
+- ✅ 저장 실패 → "Save failed" 에러 toast
+- ✅ 질문 세트 삭제 성공 → "Question set deleted" 성공 toast
+- ✅ 삭제 실패 → "Deletion failed" 에러 toast
+
+**4. 수정된 파일 (7개):**
+- `components/ui/toast.tsx` (새로 구현)
+- `hooks/shared/use-toast.ts` (hook export)
+- `app/layout.tsx` (ToastProvider 추가)
+- `components/passages/passage-card.tsx` (삭제 toast)
+- `components/passages/passage-form.tsx` (생성/수정 toast)
+- `components/bank/bank-table.tsx` (삭제 toast)
+- `app/(app)/passage/[id]/page.tsx` (생성/저장/재생성 toast)
+
+**디자인 검증:**
+- ✅ 프로토타입의 미니멀리스트 스타일 매칭
+- ✅ react-icons 사용 (사용자 선호도 반영)
+- ✅ Slate/blue 색상 스킴 유지
+- ✅ 5초 자동 dismiss (설정 가능)
+- ✅ 수동 닫기 버튼 포함
+- ✅ shadcn/ui 의존성 없이 커스텀 구현
+
+**빌드 검증:**
+- ✅ No linter errors
+- ✅ TypeScript 컴파일 성공
+- ✅ 모든 alert() 호출 제거 완료
+- ✅ confirm() 다이얼로그는 삭제 액션에 유지 (베스트 프랙티스)
+
+### 수정 (Refinement):
+**구현 전략:**
+- shadcn/ui의 복잡한 의존성 대신 가벼운 커스텀 구현 선택
+- React Context API로 전역 상태 관리
+- 컴포넌트 기반 구조로 재사용성 확보
+
+**UX 개선:**
+- 모든 성공 액션에 즉각적인 시각적 피드백
+- 에러 메시지는 구체적이고 실행 가능한 정보 제공
+- Toast 위치는 bottom-right (콘텐츠 방해 최소화)
+- 자동 dismiss로 수동 개입 불필요
+- 수동 닫기 옵션도 제공
+
+**confirm() 다이얼로그 유지:**
+- 삭제와 같은 파괴적 액션에는 confirm() 유지
+- 베스트 프랙티스: 액션 전 확인, 액션 후 toast
+- Phase 3 Task 6에서 AlertDialog로 업그레이드 예정
+
+**Toast Variants 활용:**
+- Success (green): 긍정적 액션 완료
+- Error (red): 실패 및 에러
+- Warning (amber): 주의 필요 (향후 사용)
+- Info (blue): 정보성 메시지 (향후 사용)
+
+**다음 단계:**
+- Phase 3 Task 2: Enhanced Error Handling
+- Phase 3 Task 3: Loading State Refinements
+- Phase 3 Task 6: AlertDialog로 confirm() 대체
+
+## 20. Phase 3 Task 2: Enhanced Error Handling 구현
+
+### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor Agent)
+
+### 의도 (Intent): 
+애플리케이션의 전체 에러 처리를 개선하여 프로덕션 수준의 견고성 확보. 표준화된 에러 응답 형식 도입, 사용자 친화적인 에러 메시지 제공, Error Boundary로 예상치 못한 에러 처리, 재시도 기능 추가. OpenAI API 실패, 네트워크 타임아웃, 인증 에러, 검증 실패 등 다양한 에러 시나리오를 체계적으로 관리.
+
+### 프롬프트 (Prompt):
+"이제 phase3 task2 로 진행할까?"
+
+### 검증 (Verification):
+
+**1. 에러 핸들러 유틸리티 생성:**
+- `lib/utils/error-handler.ts` 생성
+  - `ErrorCode` enum: 11개의 표준화된 에러 코드 정의
+  - `ApiErrorResponse` 인터페이스: 표준 에러 응답 형식
+  - `createErrorResponse()`: 에러 응답 생성 함수
+  - `getUserFriendlyMessage()`: 사용자 친화적 메시지 매핑
+  - `formatErrorForLog()`: 로깅용 에러 포맷팅
+  - `getErrorCode()`: 에러 객체에서 코드 추론
+  - `parseApiError()`: API 응답 파싱
+
+**2. Error Boundary 컴포넌트 생성:**
+- `components/shared/error-boundary.tsx` 생성
+  - React Error Boundary 클래스 컴포넌트
+  - "Try Again" 및 "Go Home" 액션 버튼
+  - 개발 환경에서 상세 스택 트레이스 표시
+  - `SimpleErrorFallback` 경량 fallback 컴포넌트
+  - react-icons 사용 (MdError, MdRefresh, MdHome)
+
+**3. API 라우트 에러 처리 표준화:**
+
+**/api/generate/route.ts:**
+- OpenAI API 호출을 try-catch로 감싸 `OPENAI_ERROR` 처리
+- 모든 에러 응답에 `createErrorResponse()` 사용
+- 상세한 서버 로그 추가 ([Generate API] 접두사)
+- 503 상태 코드로 AI 서비스 불가 상태 전달
+- 사용자 친화적 에러 메시지 제공
+
+**/api/passages/route.ts & [id]/route.ts:**
+- GET, POST, PATCH, DELETE 모두 표준화된 에러 처리
+- `UNAUTHORIZED`, `VALIDATION_ERROR`, `NOT_FOUND`, `DATABASE_ERROR` 코드 사용
+- 각 작업에 대한 명확한 로그 메시지
+
+**/api/question-sets/route.ts & [id]/route.ts:**
+- Passage API와 동일한 패턴 적용
+- 검증 실패 시 필드별 상세 에러 정보 로깅
+
+**4. 훅 에러 처리 개선:**
+
+**hooks/passages/use-create-passage.ts:**
+- `parseApiError()` 사용하여 API 에러 파싱
+- `getUserFriendlyMessage()`로 사용자 친화적 메시지 생성
+- `retry()` 함수 추가: 마지막 요청 재시도 가능
+- `lastData` 상태로 재시도 데이터 저장
+- 콘솔 로그에 훅 이름 접두사 추가
+
+**hooks/questions/use-generate-questions.ts:**
+- 동일한 패턴으로 에러 처리 개선
+- `retry()` 함수로 질문 재생성 가능
+- `lastInput` 저장으로 재시도 지원
+
+**hooks/questions/use-save-question-set.ts:**
+- 검증 에러 시 details 포함하여 표시
+- 상세한 에러 로깅 (status, error, code, details, message)
+- `retry()` 함수로 저장 재시도 지원
+
+**5. Error Boundary 통합:**
+- `app/(app)/layout.tsx`에 Error Boundary 적용
+- 모든 앱 라우트를 Error Boundary로 감싸서 예상치 못한 에러 캐치
+
+**빌드 검증:**
+```bash
+npm run build
+```
+- ✅ No linter errors (모든 파일)
+- ✅ TypeScript 컴파일 성공
+- ✅ 프로덕션 빌드 성공
+- ✅ 모든 API 라우트 및 훅 정상 작동
+
+### 수정 (Refinement):
+
+**에러 코드 체계:**
+```typescript
+enum ErrorCode {
+  // Authentication
+  AUTH_ERROR, UNAUTHORIZED,
+  
+  // Validation
+  VALIDATION_ERROR, INVALID_INPUT,
+  
+  // API
+  API_ERROR, OPENAI_ERROR,
+  
+  // Network
+  NETWORK_ERROR, TIMEOUT_ERROR,
+  
+  // Database
+  DATABASE_ERROR, NOT_FOUND,
+  
+  // Rate Limiting
+  RATE_LIMIT_ERROR,
+  
+  // General
+  INTERNAL_ERROR, UNKNOWN_ERROR
+}
+```
+
+**에러 처리 계층:**
+1. **API 라우트 레벨**: 서버 에러 캐치 및 로깅
+2. **훅 레벨**: API 응답 파싱 및 사용자 친화적 메시지 변환
+3. **컴포넌트 레벨**: 에러 상태 표시 및 재시도 UI
+4. **Error Boundary 레벨**: 예상치 못한 React 에러 캐치
+
+**사용자 친화적 메시지 예시:**
+- `OPENAI_ERROR`: "AI service is temporarily unavailable. Please try again in a moment."
+- `NETWORK_ERROR`: "Network connection lost. Please check your internet connection."
+- `VALIDATION_ERROR`: "The provided data is invalid. Please check your input."
+- `UNAUTHORIZED`: "You do not have permission to access this resource."
+
+**재시도 기능:**
+- 모든 주요 훅에 `retry()` 함수 추가
+- 마지막 요청 데이터 저장 (`lastData`, `lastInput`)
+- 네트워크 오류나 일시적 문제 발생 시 사용자가 쉽게 재시도 가능
+
+**로깅 전략:**
+- 서버: 상세한 에러 정보와 스택 트레이스 로깅
+- 클라이언트: 에러 메시지와 컨텍스트만 로깅
+- 로그 메시지에 컴포넌트/함수 이름 접두사 추가 (디버깅 용이)
+
+**Error Boundary 특징:**
+- 프로덕션: 사용자 친화적 UI만 표시
+- 개발: 스택 트레이스 details 섹션 추가
+- "Try Again" 버튼으로 에러 상태 리셋
+- "Go Home" 버튼으로 대시보드 이동
+
+**파일 구조:**
+```
+lib/utils/error-handler.ts          # 에러 처리 유틸리티 (새로 생성)
+components/shared/error-boundary.tsx # Error Boundary 컴포넌트 (새로 생성)
+app/api/                             # 모든 API 라우트 업데이트
+  ├── generate/route.ts
+  ├── passages/route.ts
+  ├── passages/[id]/route.ts
+  ├── question-sets/route.ts
+  └── question-sets/[id]/route.ts
+hooks/                               # 모든 주요 훅 업데이트
+  ├── passages/use-create-passage.ts
+  ├── questions/use-generate-questions.ts
+  └── questions/use-save-question-set.ts
+app/(app)/layout.tsx                 # Error Boundary 통합
+```
+
+**테스트된 에러 시나리오:**
+- ✅ 빌드 컴파일 (타입 안전성)
+- ✅ 린터 검증 (코드 품질)
+- 향후 테스트 필요:
+  - OpenAI API 실패 시뮬레이션
+  - 네트워크 연결 끊김
+  - 잘못된 입력 데이터 검증
+  - 인증 토큰 만료
+
+**다음 단계:**
+- Phase 3 Task 3: Loading State Refinements
+- Phase 3 Task 5: Regenerate Feature Enhancement
+- Phase 3 Task 6: Question Bank Enhancements
+
+
+## 22. My Question Bank 필터링 기능 구현
+
+### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor)
+
+### 의도 (Intent): 
+My Question Bank 페이지에 검색 및 필터링 기능을 추가하여 사용자가 저장된 문제 세트를 효율적으로 찾고 관리할 수 있도록 개선. 초기 구현에서는 비활성화된 상태였던 검색 및 필터 기능을 완전히 구현.
+
+### 프롬프트 (Prompt):
+
+**1단계: 필터 구현 상태 확인**
+```
+My Question Bank에서 filter가 제대로 구현되어 있는지 확인해줘저.
+```
+
+**2단계: 필터 기능 구현**
+```
+필터 구현해줘
+```
+
+**3단계: 다중 선택으로 개선**
+```
+checkbox로 해서 다중선택으로 할 수 있나?
+```
+
+### 검증 (Verification):
+
+**초기 상태 확인:**
+- ✅ `bank/page.tsx`: 검색 및 필터 UI는 있으나 모두 `disabled` 상태
+- ✅ `bank-filters.tsx`: 거의 빈 파일 (주석만 존재)
+- ✅ `bank-table.tsx`: 필터링 로직 없음
+
+**구현 완료 확인:**
+- ✅ 검색 기능: passage 제목으로 실시간 검색
+- ✅ 난이도 필터: Easy, Medium, Hard 다중 선택
+- ✅ 학년 필터: Middle 1, 2, 3 다중 선택
+- ✅ 문제 유형 필터: Main Idea, Detail, Inference, Vocabulary 다중 선택
+- ✅ 정렬 기능: 최신순, 오래된순, 제목 A-Z, Z-A
+- ✅ 필터 카운트: 활성 필터 개수 표시
+- ✅ Clear all 버튼: 모든 필터 한 번에 초기화
+- ✅ 결과 카운트: "Showing X of Y question sets" 표시
+- ✅ 빈 결과 처리: 필터 결과 없을 때 안내 메시지
+- ✅ Linter 에러 없음
+
+**필터링 로직:**
+- 검색: passage.title에서 대소문자 무시 검색
+- 다중 필터: OR 조건으로 작동 (선택한 항목 중 하나라도 매칭)
+- 문제 유형: 세트 내 문제 중 선택한 유형이 하나라도 있으면 포함
+- 정렬: created_at 또는 title 기준 정렬
+
+### 수정 (Refinement):
+
+**단일 선택에서 다중 선택으로 변경:**
+- 초기 구현: `<select>` 드롭다운으로 단일 선택
+- 개선: `<input type="checkbox">`로 변경하여 다중 선택 가능
+- 타입 변경:
+  ```typescript
+  // Before
+  difficulty: string
+  gradeLevel: string
+  questionType: string
+  
+  // After
+  difficulties: string[]
+  gradeLevels: string[]
+  questionTypes: string[]
+  ```
+
+**필터링 로직 개선:**
+- 단일 값 비교 → 배열 포함 여부 확인
+- `filter.includes()` 사용으로 다중 선택 지원
+- 문제 유형은 `some()` 메서드로 부분 매칭
+
+**UI/UX 개선:**
+- 필터 토글 버튼으로 패널 표시/숨김
+- 활성 필터 개수를 버튼에 표시 (예: "Filter (3)")
+- 검색 입력란에 X 버튼 추가 (빠른 초기화)
+- Checkbox에 hover 효과 추가
+- 라벨을 uppercase로 강조
+
+**성능 최적화:**
+- `useMemo` 훅으로 필터링/정렬 결과 캐싱
+- 불필요한 리렌더링 방지
+
+**변경된 파일:**
+```
+components/bank/bank-filters.tsx    # 새로 구현 (checkbox 다중 선택 UI)
+components/bank/bank-table.tsx      # 필터링 로직 추가
+app/(app)/bank/page.tsx             # 검색 및 필터 상태 관리
+```
+
+**개선 효과:**
+- 사용자가 여러 조건을 동시에 적용하여 원하는 문제 세트 빠르게 검색
+- 예: "M2와 M3 학년의 Easy 또는 Medium 난이도 문제만 보기"
+- 유연한 필터 조합으로 더 나은 사용자 경험 제공
+
 

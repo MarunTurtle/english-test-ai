@@ -46,6 +46,8 @@ build/Release/
 # ==============================================================================
 # Prerequisites notes file contains API keys and sensitive credentials
 docs/prerequisites_notes.md
+docs/archive/prerequisites_notes.md
+**/prerequisites_notes.md
 
 # ==============================================================================
 # Testing & Coverage
