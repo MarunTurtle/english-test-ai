@@ -307,7 +307,7 @@ OPENAI_API_KEY=...                  # Server-side only
 ### **Phase 1: Foundation**
 1. Project setup (Next.js, TypeScript, Tailwind, shadcn/ui)
 2. Supabase configuration (client/server setup)
-3. Auth flow (Google OAuth + middleware)
+3. Auth flow (Google OAuth + proxy)
 4. Basic layout (Sidebar + protected routes)
 
 ### **Phase 2: Core Features**
