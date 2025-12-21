@@ -573,3 +573,182 @@ export const config = {
 - RLS와 연동된 서버 사이드 검증
 - 모든 보호된 라우트에 대한 일관된 접근 제어
 
+## 11. Phase 1: Foundation - 앱 레이아웃, 사이드바 및 인증 보호 구현
+
+### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor Agent)
+
+### 의도 (Intent): 프로토타입의 UI를 참고하여 실제 앱의 기본 구조(레이아웃, 사이드바 네비게이션, 인증 가드)를 구현. 모든 보호된 라우트에 대한 일관된 레이아웃과 네비게이션을 제공하며, 프로토타입에서 경험한 것과 동일한 UI/UX를 Next.js App Router에서 구현.
+
+### 프롬프트 (Prompt):
+**1단계: 개발 우선순위 확인**
+```
+Now according to @docs/edited_project_blueprint.md and @docs/project_structure.md, what should I start developing now? I have completed the landing page and google oauth.
+```
+
+**2단계: Phase 1 Foundation 시작**
+```
+Ok then, let's start with Phase1 Foundation (complete first). 
+Take into account the @docs/prototype_code.tsx for the ui.
+```
+
+**3단계: 무한 리디렉트 루프 문제 발생**
+```
+After I logged in, I got this infinite redirects...
+```
+(터미널 로그에서 `/login` ↔ `/dashboard` 간 무한 리디렉트 확인)
+
+### 검증 (Verification):
+**생성된 파일 및 구조:**
+
+**1. Route Constants** - `lib/constants/routes.ts`
+- 모든 앱 라우트 경로를 상수로 정의
+- Public routes와 Protected routes 분리
+- Type-safe route 함수 (예: `PASSAGE_DETAIL(id)`)
+
+**2. Layout Components**:
+- `components/layout/sidebar-nav-item.tsx`: 재사용 가능한 네비게이션 아이템
+  - `usePathname`으로 active 상태 감지
+  - 프로토타입의 스타일 그대로 적용 (active 시 white background)
+  
+- `components/layout/workflow-indicator.tsx`: 워크플로우 진행 표시기
+  - Input → Generate → Review → Save 4단계 표시
+  - 현재 단계 하이라이트
+
+- `components/auth/logout-button.tsx`: 로그아웃 버튼
+  - `useAuth` hook 사용
+  - react-icons 사용 (사용자 선호 반영)
+
+- `components/layout/sidebar.tsx`: 메인 사이드바
+  - 프로토타입 디자인 완전 재현
+  - "New Question Set", "Question Bank" 네비게이션
+  - 하단에 워크플로우 인디케이터 + 로그아웃 버튼
+  - Database 아이콘과 "AI Workbench" 브랜딩
+
+**3. Auth Guard** - `components/auth/auth-guard.tsx`
+- Client-side 인증 보호
+- Loading 상태 처리
+- 미인증 시 로딩 스피너 표시
+
+**4. App Layout** - `app/(app)/layout.tsx`
+- `AuthGuard`로 전체 래핑
+- Sidebar + Main content area flex 레이아웃
+- 프로토타입의 "flex h-screen bg-white" 스타일 재현
+
+**5. 업데이트된 페이지**:
+- `app/(app)/dashboard/page.tsx`: 
+  - Welcome 메시지와 사용자 이메일 표시
+  - "Create New Passage" CTA 버튼
+  - 빈 상태(empty state) UI
+  
+- `app/(app)/bank/page.tsx`:
+  - Question Bank 페이지 스켈레톤
+  - Search bar와 Filter 버튼
+  - 빈 테이블 UI
+
+**UI/UX 검증:**
+- 프로토타입의 slate-100 배경색 사이드바 재현
+- Active state 시 white background + blue text + shadow
+- "Teacher Control Panel" 서브타이틀
+- 워크플로우 인디케이터 blue-50 배경
+- react-icons 사용 (lucide-react 대신)
+- No linter errors
+
+### 수정 (Refinement):
+**문제 1: 무한 리디렉트 루프**
+
+**원인 분석:**
+1. `proxy.ts`가 이미 존재하며 auth 리디렉트 처리 중
+2. 새로 만든 `middleware.ts`와 충돌 → Next.js 에러 발생
+3. 원래 `proxy.ts`가 미인증 사용자를 `/` (홈)으로 리디렉트
+4. `AuthGuard`가 client-side에서 `/login`으로 리디렉트 시도
+5. `AuthProvider`에 `loading` state 누락으로 premature render
+
+**해결 과정:**
+
+**Step 1: middleware.ts 삭제**
+- Next.js는 `middleware.ts`와 `proxy.ts`를 동시에 허용하지 않음
+- `proxy.ts` 사용 (이미 존재했던 파일)
+
+**Step 2: proxy.ts 리디렉트 로직 수정**
+```typescript
+// Before (문제 있는 코드)
+if (!session && isProtectedRoute) {
+  return NextResponse.redirect(new URL('/', request.url))  // 홈으로 리디렉트
+}
+if (session && pathname === '/') {
+  return NextResponse.redirect(new URL('/dashboard', request.url))
+}
+
+// After (수정된 코드)
+const isAuthRoute = request.nextUrl.pathname.startsWith('/login')
+const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
+
+// 미인증 + 보호된 라우트 → /login으로
+if (!user && isProtectedRoute && !isAuthCallback) {
+  return NextResponse.redirect(new URL('/login', request.url))
+}
+
+// 인증됨 + (로그인 페이지 or 홈) → /dashboard로
+if (user && (isAuthRoute || request.nextUrl.pathname === '/')) {
+  return NextResponse.redirect(new URL('/dashboard', request.url))
+}
+```
+
+**Step 3: AuthProvider에 loading state 추가**
+```typescript
+// Before
+interface AuthContextType {
+  session: Session | null;
+  user: User | null;
+  signOut: () => Promise<void>;
+}
+
+// After
+interface AuthContextType {
+  session: Session | null;
+  user: User | null;
+  loading: boolean;  // ← 추가
+  signOut: () => Promise<void>;
+}
+```
+
+**Step 4: AuthGuard 단순화**
+```typescript
+// Before: Client-side redirect 시도 (문제 발생)
+useEffect(() => {
+  if (!loading && !user) {
+    router.push(ROUTES.LOGIN);  // ← 제거
+  }
+}, [user, loading, router]);
+
+// After: Middleware에 맡김
+// Loading만 처리, redirect는 proxy.ts가 담당
+if (loading) return <LoadingSpinner />;
+if (!user) return null;
+```
+
+**최종 인증 플로우:**
+1. **Edge (proxy.ts)**: 모든 요청 가로채기 → 세션 없으면 `/login`으로, 있으면 통과
+2. **Client (AuthProvider)**: 실시간 세션 변경 감지, loading state 관리
+3. **Client (AuthGuard)**: Loading UI 표시, 미인증 시 null 반환 (proxy가 이미 리디렉트함)
+
+**테스트 결과:**
+- 비로그인 상태에서 `/dashboard` 접근 → `/login`으로 즉시 리디렉트
+- 로그인 후 `/dashboard` 접근 → 정상 표시
+- 로그인 상태에서 `/login` 접근 → `/dashboard`로 리디렉트
+- 로그인 상태에서 `/` 접근 → `/dashboard`로 리디렉트
+- 무한 리디렉트 루프 해결
+
+**핵심 교훈:**
+1. **Next.js 제약**: `middleware.ts`와 `proxy.ts` 동시 사용 불가
+2. **책임 분리**: Edge에서 redirect, Client에서 UI state만 관리
+3. **Loading state**: Auth 체크 중 premature render 방지 필수
+4. **Auth callback 예외**: OAuth callback 라우트는 리디렉트 대상에서 제외
+
+**파일 요약:**
+- 생성: 7개 컴포넌트 + 1개 constants 파일
+- 수정: `proxy.ts`, `AuthProvider`, `AuthGuard`
+- 삭제: `middleware.ts` (충돌 해결)
+- 업데이트: Dashboard, Bank 페이지
+
+
