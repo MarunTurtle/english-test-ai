@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const questionSchema = z.object({
+  id: z.string(),
   type: z.enum(['Main Idea', 'Detail', 'Inference', 'Vocabulary']),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']),
   question_text: z.string().min(1),
