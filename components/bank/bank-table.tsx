@@ -1,16 +1,80 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuestionSets } from '@/hooks/questions/use-question-sets';
 import { BankRow } from './bank-row';
 import { EmptyState } from '@/components/shared/empty-state';
 import { FiDatabase, FiLoader } from 'react-icons/fi';
 import { useToast } from '@/hooks/shared/use-toast';
+import type { FilterOptions } from './bank-filters';
+import type { QuestionSetWithPassage } from '@/types';
 
-export function BankTable() {
+interface BankTableProps {
+  filters: FilterOptions;
+}
+
+export function BankTable({ filters }: BankTableProps) {
   const { questionSets, loading, error, refetch } = useQuestionSets();
   const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Apply filters and sorting
+  const filteredAndSortedSets = useMemo(() => {
+    if (!questionSets) return [];
+
+    let filtered = [...questionSets];
+
+    // Search filter
+    if (filters.search.trim()) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter((set) => {
+        const titleMatch = set.passage?.title?.toLowerCase().includes(searchLower);
+        return titleMatch;
+      });
+    }
+
+    // Difficulty filter (multiple selection)
+    if (filters.difficulties.length > 0) {
+      filtered = filtered.filter((set) => 
+        filters.difficulties.includes(set.difficulty)
+      );
+    }
+
+    // Grade level filter (multiple selection)
+    if (filters.gradeLevels.length > 0) {
+      filtered = filtered.filter((set) => 
+        set.passage?.grade_level && filters.gradeLevels.includes(set.passage.grade_level)
+      );
+    }
+
+    // Question type filter (multiple selection)
+    if (filters.questionTypes.length > 0) {
+      filtered = filtered.filter((set) => {
+        // Check if the set contains ANY of the selected question types
+        return set.payload?.questions?.some(
+          (q) => filters.questionTypes.includes(q.type)
+        );
+      });
+    }
+
+    // Sorting
+    filtered.sort((a, b) => {
+      switch (filters.sortBy) {
+        case 'date-desc':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'date-asc':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'title-asc':
+          return (a.passage?.title || '').localeCompare(b.passage?.title || '');
+        case 'title-desc':
+          return (b.passage?.title || '').localeCompare(a.passage?.title || '');
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [questionSets, filters]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this question set?')) {
@@ -98,7 +162,11 @@ export function BankTable() {
     );
   }
 
-  if (questionSets.length === 0) {
+  // Check if no results after filtering
+  const hasNoResults = questionSets.length === 0;
+  const hasNoFilteredResults = filteredAndSortedSets.length === 0 && questionSets.length > 0;
+
+  if (hasNoResults) {
     return (
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <table className="w-full text-left">
@@ -135,6 +203,44 @@ export function BankTable() {
     );
   }
 
+  if (hasNoFilteredResults) {
+    return (
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <table className="w-full text-left">
+          <thead className="bg-slate-50 border-b border-slate-100">
+            <tr>
+              <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Passage Title
+              </th>
+              <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Details
+              </th>
+              <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Date
+              </th>
+              <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colSpan={4} className="px-6 py-20 text-center text-slate-400">
+                <div className="flex flex-col items-center gap-3">
+                  <FiDatabase className="w-12 h-12 text-slate-300" />
+                  <p className="italic">
+                    No question sets match the current filters.
+                  </p>
+                  <p className="text-sm">Try adjusting your search criteria.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <table className="w-full text-left">
@@ -155,7 +261,7 @@ export function BankTable() {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
-          {questionSets.map((questionSet) => (
+          {filteredAndSortedSets.map((questionSet) => (
             <BankRow
               key={questionSet.id}
               questionSet={questionSet}
@@ -165,6 +271,13 @@ export function BankTable() {
           ))}
         </tbody>
       </table>
+      
+      {/* Results count */}
+      {filteredAndSortedSets.length > 0 && (
+        <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 text-xs text-slate-500">
+          Showing {filteredAndSortedSets.length} of {questionSets.length} question set{questionSets.length !== 1 ? 's' : ''}
+        </div>
+      )}
     </div>
   );
 }
