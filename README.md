@@ -8,6 +8,12 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+## 🌐 라이브 데모
+
+**배포 URL**: [https://english-test-ai.vercel.app](https://english-test-ai.vercel.app)
+
+Google 계정으로 로그인하여 완전한 기능을 체험해보세요.
+
 ---
 
 ## 개요
