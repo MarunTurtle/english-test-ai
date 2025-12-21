@@ -131,7 +131,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(responseValidation.data);
+    // Add unique IDs to each question before returning
+    const questionsWithIds = questions.map((q, index) => ({
+      ...q,
+      id: `q${index + 1}-${Date.now()}`,
+      options: q.options as [string, string, string, string], // Ensure tuple type
+    }));
+
+    return NextResponse.json({
+      questions: questionsWithIds,
+      meta,
+    });
   } catch (error) {
     console.error('Error generating questions:', error);
     return NextResponse.json(
