@@ -1,22 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreatePassage } from '@/hooks/passages/use-create-passage';
+import { useUpdatePassage } from '@/hooks/passages/use-update-passage';
 import { GRADE_LEVELS, GradeLevel } from '@/lib/constants/grade-levels';
 import { FiAlertCircle, FiLoader } from 'react-icons/fi';
+import { Passage } from '@/types/passage';
 
 const MIN_CHARS = 100;
 const MAX_CHARS = 10000;
 
-export function PassageForm() {
+interface PassageFormProps {
+  mode?: 'create' | 'edit';
+  initialPassage?: Passage;
+}
+
+export function PassageForm({ mode = 'create', initialPassage }: PassageFormProps) {
   const router = useRouter();
-  const { createPassage, loading, error: apiError } = useCreatePassage();
+  const { createPassage, loading: createLoading, error: createError } = useCreatePassage();
+  const { updatePassage, loading: updateLoading, error: updateError } = useUpdatePassage();
   
   const [content, setContent] = useState('');
   const [gradeLevel, setGradeLevel] = useState<GradeLevel>('M2');
   const [title, setTitle] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Initialize form with existing passage data if in edit mode
+  useEffect(() => {
+    if (mode === 'edit' && initialPassage) {
+      setContent(initialPassage.content);
+      setGradeLevel(initialPassage.grade_level as GradeLevel);
+      setTitle(initialPassage.title);
+    }
+  }, [mode, initialPassage]);
+
+  const loading = mode === 'create' ? createLoading : updateLoading;
+  const apiError = mode === 'create' ? createError : updateError;
 
   const charCount = content.length;
   const isContentValid = charCount >= MIN_CHARS && charCount <= MAX_CHARS;
@@ -32,16 +52,30 @@ export function PassageForm() {
 
     setValidationError(null);
 
-    // Create passage
-    const passage = await createPassage({
-      content,
-      grade_level: gradeLevel,
-      title: title.trim() || undefined,
-    });
+    if (mode === 'create') {
+      // Create new passage
+      const passage = await createPassage({
+        content,
+        grade_level: gradeLevel,
+        title: title.trim() || undefined,
+      });
 
-    if (passage) {
-      // Redirect to workbench
-      router.push(`/passage/${passage.id}`);
+      if (passage) {
+        // Redirect to workbench
+        router.push(`/passage/${passage.id}`);
+      }
+    } else if (mode === 'edit' && initialPassage) {
+      // Update existing passage
+      const updatedPassage = await updatePassage(initialPassage.id, {
+        content,
+        grade_level: gradeLevel,
+        title: title.trim() || undefined,
+      });
+
+      if (updatedPassage) {
+        // Redirect back to passage detail
+        router.push(`/passage/${updatedPassage.id}`);
+      }
     }
   };
 
@@ -54,8 +88,14 @@ export function PassageForm() {
       {/* Header */}
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Create New Passage</h2>
-          <p className="text-slate-500">Provide a reading passage and select the grade level.</p>
+          <h2 className="text-2xl font-bold text-slate-800">
+            {mode === 'create' ? 'Create New Passage' : 'Edit Passage'}
+          </h2>
+          <p className="text-slate-500">
+            {mode === 'create' 
+              ? 'Provide a reading passage and select the grade level.' 
+              : 'Update your passage content and settings.'}
+          </p>
         </div>
       </div>
 
@@ -154,10 +194,10 @@ export function PassageForm() {
               {loading ? (
                 <>
                   <FiLoader className="animate-spin" />
-                  Creating...
+                  {mode === 'create' ? 'Creating...' : 'Updating...'}
                 </>
               ) : (
-                'Create Passage'
+                mode === 'create' ? 'Create Passage' : 'Update Passage'
               )}
             </button>
 

@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { usePassage } from "@/hooks/passages/use-passage";
 import { useGenerateQuestions } from "@/hooks/questions/use-generate-questions";
 import { GenerationSettings } from "@/components/generation/generation-settings";
 import { GenerationLoader } from "@/components/generation/generation-loader";
 import { ValidationScreen } from "@/components/generation/validation-screen";
 import type { GenerationSettings as GenerationSettingsType, Question } from "@/types/question";
-import { FiLoader, FiAlertCircle, FiChevronLeft, FiSave } from "react-icons/fi";
+import { FiLoader, FiAlertCircle, FiChevronLeft, FiSave, FiEdit2 } from "react-icons/fi";
 
 type WorkflowPhase = 'input' | 'generating' | 'results';
 
 export default function PassageDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const passageId = params?.id as string;
   const { passage, loading, error } = usePassage(passageId);
   const { generateQuestions, isGenerating, error: generateError } = useGenerateQuestions();
@@ -60,6 +61,10 @@ export default function PassageDetailPage() {
   const handleSave = () => {
     // TODO: Implement save to database in next phase
     alert('Save functionality will be implemented in the next phase!');
+  };
+
+  const handleEdit = () => {
+    router.push(`/passage/${passageId}/edit`);
   };
 
   const handleUpdateQuestion = (questionId: string, updatedQuestion: Question) => {
@@ -130,6 +135,13 @@ export default function PassageDetailPage() {
             <h2 className="text-2xl font-bold text-slate-800">1. Input & Settings</h2>
             <p className="text-slate-500">Review your passage and configure generation settings.</p>
           </div>
+          <button
+            onClick={handleEdit}
+            className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 flex items-center gap-2 transition-colors"
+          >
+            <FiEdit2 className="w-4 h-4" />
+            Edit Passage
+          </button>
         </div>
 
         <div className="grid grid-cols-12 gap-8">
