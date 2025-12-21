@@ -4,7 +4,7 @@ const TITLE_GENERATION_SYSTEM_PROMPT = `You are an assistant that generates conc
 
 Your task is to create a title that:
 - Accurately reflects the main topic or theme of the passage
-- Is concise (maximum 200 characters)
+- Is SHORT and concise (maximum 30 characters preferred, 100 characters absolute maximum)
 - Is appropriate for educational content
 - Uses proper capitalization and grammar
 
@@ -18,7 +18,7 @@ Required JSON Schema:
 CRITICAL RULES:
 1. Output ONLY valid JSON - no markdown code blocks, no extra text
 2. The title should be clear and descriptive
-3. Keep the title under 200 characters
+3. Keep the title under 30 characters (absolute maximum 100 characters)
 4. Use title case (capitalize important words)
 5. Do not include quotation marks around the title in the JSON value`;
 
@@ -64,9 +64,9 @@ Generate the title now in valid JSON format.`;
       throw new Error('Generated title is empty');
     }
 
-    // Fallback to first 50 chars if title is too long (shouldn't happen, but safety check)
-    if (title.length > 200) {
-      return title.substring(0, 197).trim() + '...';
+    // Fallback to first 97 chars if title is too long (shouldn't happen, but safety check)
+    if (title.length > 100) {
+      return title.substring(0, 97).trim() + '...';
     }
 
     return title;

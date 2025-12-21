@@ -7,7 +7,7 @@ export const gradeLevelSchema = z.enum(['M1', 'M2', 'M3']);
 export const passageSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
-  title: z.string().max(200, 'Title must be 200 characters or less'),
+  title: z.string().max(100, 'Title must be 100 characters or less'),
   content: z
     .string()
     .min(100, 'Passage must be at least 100 characters')
@@ -23,7 +23,7 @@ export const createPassageSchema = z.object({
     .min(100, 'Passage must be at least 100 characters')
     .max(10000, 'Passage must be 10,000 characters or less'),
   grade_level: gradeLevelSchema,
-  title: z.string().max(200, 'Title must be 200 characters or less').optional(),
+  title: z.string().max(100, 'Title must be 100 characters or less').optional(),
 });
 
 // Update passage input validation
@@ -34,7 +34,7 @@ export const updatePassageSchema = z.object({
     .max(10000, 'Passage must be 10,000 characters or less')
     .optional(),
   grade_level: gradeLevelSchema.optional(),
-  title: z.string().max(200, 'Title must be 200 characters or less').optional(),
+  title: z.string().max(100, 'Title must be 100 characters or less').optional(),
 });
 
 // Type exports
