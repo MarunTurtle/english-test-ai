@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import type { QuestionSetWithPassage } from '@/types';
-import { FiFileText, FiTrash2 } from 'react-icons/fi';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { Spinner } from '@/components/shared/spinner';
 
 interface BankRowProps {
@@ -14,8 +14,12 @@ interface BankRowProps {
 export function BankRow({ questionSet, onDelete, isDeleting }: BankRowProps) {
   const router = useRouter();
 
-  const handleView = () => {
+  const handleEdit = () => {
     router.push(`/passage/${questionSet.passage_id}`);
+  };
+
+  const handleTitleClick = () => {
+    router.push(`/bank/${questionSet.id}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -30,10 +34,13 @@ export function BankRow({ questionSet, onDelete, isDeleting }: BankRowProps) {
   return (
     <tr className="hover:bg-slate-50 transition-colors">
       <td className="px-6 py-4">
-        <p className="font-bold text-slate-700 truncate max-w-md">
+        <button
+          onClick={handleTitleClick}
+          className="text-left font-bold text-slate-700 hover:text-blue-600 truncate max-w-md transition-colors underline decoration-transparent hover:decoration-blue-600"
+        >
           {questionSet.passage.title}
-        </p>
-        <span className="text-xs text-slate-400">
+        </button>
+        <span className="text-xs text-slate-400 block mt-1">
           Questions: {questionSet.question_count} items
         </span>
       </td>
@@ -52,12 +59,12 @@ export function BankRow({ questionSet, onDelete, isDeleting }: BankRowProps) {
       </td>
       <td className="px-6 py-4 text-right space-x-2">
         <button
-          onClick={handleView}
+          onClick={handleEdit}
           className="p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
-          title="View"
+          title="Edit"
           disabled={isDeleting}
         >
-          <FiFileText className="w-5 h-5" />
+          <FiEdit2 className="w-5 h-5" />
         </button>
         <button
           onClick={() => onDelete(questionSet.id)}
