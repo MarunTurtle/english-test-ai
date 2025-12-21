@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { usePassage } from "@/hooks/passages/use-passage";
 import { useGenerateQuestions } from "@/hooks/questions/use-generate-questions";
 import { useSaveQuestionSet } from "@/hooks/questions/use-save-question-set";
@@ -19,9 +19,11 @@ type WorkflowPhase = 'input' | 'generating' | 'results';
 export default function PassageDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const { setCurrentStep } = useWorkflow();
   const passageId = params?.id as string;
+  const questionSetId = searchParams.get('questionSetId');
   const { passage, loading, error } = usePassage(passageId);
   const { generateQuestions, isGenerating, error: generateError } = useGenerateQuestions();
   const { saveQuestionSet, loading: isSaving, error: saveError } = useSaveQuestionSet();
@@ -52,6 +54,41 @@ export default function PassageDetailPage() {
       setCurrentStep(undefined);
     };
   }, [phase, setCurrentStep]);
+
+  // Load question set if questionSetId is provided
+  useEffect(() => {
+    const loadQuestionSet = async () => {
+      if (!questionSetId) return;
+
+      try {
+        const response = await fetch(`/api/question-sets/${questionSetId}`);
+        if (!response.ok) {
+          throw new Error('Failed to load question set');
+        }
+
+        const data = await response.json();
+        const questionSet = data.questionSet;
+
+        // Set questions and move to results phase
+        setQuestions(questionSet.payload.questions);
+        setSettings({
+          difficulty: questionSet.difficulty,
+          questionCount: questionSet.question_count,
+          questionTypes: questionSet.question_types,
+        });
+        setPhase('results');
+      } catch (err) {
+        console.error('Error loading question set:', err);
+        toast({
+          title: 'Failed to load questions',
+          description: 'Could not load the saved questions. Please try again.',
+          variant: 'error',
+        });
+      }
+    };
+
+    loadQuestionSet();
+  }, [questionSetId, toast]);
 
   const handleGenerate = async () => {
     if (!passage) return;
