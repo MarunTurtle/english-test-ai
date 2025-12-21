@@ -35,7 +35,7 @@ export function PassageCard({ passage, onDelete }: PassageCardProps) {
     e.stopPropagation();
     setShowDeleteDialog(true);
   };
-
+    
   const handleConfirmDelete = async () => {
     setIsDeleting(true);
 
@@ -73,51 +73,51 @@ export function PassageCard({ passage, onDelete }: PassageCardProps) {
 
   return (
     <>
-      <div 
-        className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-        onClick={handleView}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-semibold text-slate-800 line-clamp-1">
-            {passage.title}
-          </h3>
-          <span className="px-2 py-1 text-xs font-medium bg-blue-50 text-blue-600 rounded ml-2 whitespace-nowrap">
-            {gradeLabel}
-          </span>
+    <div 
+      className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleView}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-2">
+        <h3 className="text-lg font-semibold text-slate-800 line-clamp-1">
+          {passage.title}
+        </h3>
+        <span className="px-2 py-1 text-xs font-medium bg-blue-50 text-blue-600 rounded ml-2 whitespace-nowrap">
+          {gradeLabel}
+        </span>
+      </div>
+
+      {/* Content Preview */}
+      <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+        {contentPreview}
+      </p>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center text-xs text-slate-500">
+          <FiCalendar className="mr-1" />
+          <span>{createdDate}</span>
         </div>
 
-        {/* Content Preview */}
-        <p className="text-sm text-slate-600 mb-3 line-clamp-2">
-          {contentPreview}
-        </p>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center text-xs text-slate-500">
-            <FiCalendar className="mr-1" />
-            <span>{createdDate}</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleView}
-              className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-              title="View passage"
-            >
-              <FiEye size={16} />
-            </button>
-            <button
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-              title="Delete passage"
-            >
-              <FiTrash2 size={16} />
-            </button>
-          </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleView}
+            className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            title="View passage"
+          >
+            <FiEye size={16} />
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+            title="Delete passage"
+          >
+            <FiTrash2 size={16} />
+          </button>
         </div>
       </div>
+    </div>
 
       <AlertDialog
         open={showDeleteDialog}
