@@ -179,10 +179,17 @@ export function PassageForm({ mode = 'create', initialPassage }: PassageFormProp
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Auto-generated from content"
-                maxLength={200}
+                maxLength={100}
                 className="w-full p-3 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
-              <p className="text-xs text-slate-500">Leave empty to auto-generate from passage</p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-slate-500">Leave empty to auto-generate from passage</p>
+                <p className={`text-xs font-medium ${
+                  title.length > 100 ? 'text-red-600' : 'text-slate-400'
+                }`}>
+                  {title.length}/100
+                </p>
+              </div>
             </div>
 
             {/* Grade Level */}
