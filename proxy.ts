@@ -35,20 +35,24 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Protect all routes under (app) group
-  if (request.nextUrl.pathname.startsWith('/dashboard') ||
-      request.nextUrl.pathname.startsWith('/bank') ||
-      request.nextUrl.pathname.startsWith('/passage')) {
-    if (!session) {
-      // Redirect to home/login page
-      return NextResponse.redirect(new URL('/', request.url))
-    }
+  const isAuthRoute = request.nextUrl.pathname.startsWith('/login')
+  const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
+  const isProtectedRoute = 
+    request.nextUrl.pathname.startsWith('/dashboard') ||
+    request.nextUrl.pathname.startsWith('/passage') ||
+    request.nextUrl.pathname.startsWith('/bank')
+
+  // If user is not logged in and trying to access protected route, redirect to login
+  if (!user && isProtectedRoute && !isAuthCallback) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // If logged in and on home page, redirect to dashboard
-  if (request.nextUrl.pathname === '/' && session) {
+  // If user is logged in and trying to access login page or home, redirect to dashboard
+  if (user && (isAuthRoute || request.nextUrl.pathname === '/')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
