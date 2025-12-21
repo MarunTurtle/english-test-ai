@@ -27,6 +27,7 @@ export default function PassageDetailPage() {
     questionTypes: ['Main Idea', 'Detail'],
   });
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [regeneratingQuestionId, setRegeneratingQuestionId] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     if (!passage) return;
@@ -79,6 +80,9 @@ export default function PassageDetailPage() {
     const questionToRegenerate = questions.find(q => q.id === questionId);
     if (!questionToRegenerate) return;
 
+    // Set loading state
+    setRegeneratingQuestionId(questionId);
+
     try {
       // Generate a single new question with same settings
       const newQuestions = await generateQuestions({
@@ -98,6 +102,9 @@ export default function PassageDetailPage() {
     } catch (err) {
       console.error('Regeneration failed:', err);
       alert(`Failed to regenerate question: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      // Clear loading state
+      setRegeneratingQuestionId(null);
     }
   };
 
@@ -235,6 +242,7 @@ export default function PassageDetailPage() {
             questions={questions}
             onUpdateQuestion={handleUpdateQuestion}
             onRegenerateQuestion={handleRegenerateQuestion}
+            regeneratingQuestionId={regeneratingQuestionId}
           />
         </div>
       </div>
