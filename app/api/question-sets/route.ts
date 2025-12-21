@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     const validationResult = createQuestionSetSchema.safeParse(body);
 
     if (!validationResult.success) {
+      console.error('Question set validation failed:', validationResult.error.flatten());
       return NextResponse.json(
         { 
           error: 'Validation failed', 

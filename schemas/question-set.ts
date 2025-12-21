@@ -14,12 +14,12 @@ const questionSetMetaSchema = z.object({
   grade_level: z.enum(GRADE_VALUES),
   difficulty: z.enum(DIFFICULTY_VALUES),
   question_types: z.array(z.enum(QUESTION_TYPE_VALUES)),
-  question_count: z.number().int().min(5).max(10),
+  question_count: z.number().int().min(1).max(10), // Allow 1-10 questions
 });
 
 // Schema for the complete payload
 export const questionSetPayloadSchema = z.object({
-  questions: z.array(questionSchema),
+  questions: z.array(questionSchema).min(1), // At least 1 question required
   meta: questionSetMetaSchema,
 });
 
@@ -27,7 +27,7 @@ export const questionSetPayloadSchema = z.object({
 export const createQuestionSetSchema = z.object({
   passage_id: z.string().uuid(),
   difficulty: z.enum(DIFFICULTY_VALUES),
-  question_count: z.number().int().min(5).max(10),
+  question_count: z.number().int().min(1).max(10), // Allow 1-10 questions
   question_types: z.array(z.enum(QUESTION_TYPE_VALUES)).min(1),
   payload: questionSetPayloadSchema,
 });

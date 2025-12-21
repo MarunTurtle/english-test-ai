@@ -35,6 +35,14 @@ export function useSaveQuestionSet(): UseSaveQuestionSetReturn {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('Save question set failed:', errorData);
+        
+        // If there are validation details, include them in the error message
+        if (errorData.details) {
+          const detailsStr = JSON.stringify(errorData.details, null, 2);
+          throw new Error(`${errorData.error}: ${detailsStr}`);
+        }
+        
         throw new Error(errorData.error || 'Failed to save question set');
       }
 
