@@ -1896,6 +1896,427 @@ app/(app)/layout.tsx                 # Error Boundary 통합
 - Phase 3 Task 6: Question Bank Enhancements
 
 
+## 23. Phase 3 Task 3: Loading State Refinements 구현
+
+### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor Agent)
+
+### 의도 (Intent):
+애플리케이션의 모든 로딩 상태를 세련되게 개선하여 사용자에게 일관되고 명확한 피드백 제공. Skeleton loaders로 콘텐츠 로딩을 부드럽게 표현하고, 모든 액션 버튼에 로딩 spinner와 설명적 텍스트를 추가. 레이아웃 shift 방지 및 double-click 방지로 UX 개선. 프로토타입 디자인과 일관성 유지.
+
+### 프롬프트 (Prompt):
+"task3 시작하자."
+
+### 검증 (Verification):
+
+**1. Skeleton Loader 컴포넌트 생성:**
+- `components/shared/skeleton-loader.tsx` 생성
+  - `card` variant: Passage 카드용 skeleton (제목 + 3줄 내용 + 푸터)
+  - `question` variant: Question 카드용 skeleton (헤더 + 질문 + 4개 옵션 + evidence)
+  - `table-row` variant: Bank table row용 skeleton (7개 컬럼)
+  - `text` variant: 텍스트 라인용 skeleton (3줄)
+  - `count` prop으로 개수 조절 가능
+  - Tailwind `animate-pulse` 사용
+  - `bg-slate-200` 색상 일관성
+
+- `components/shared/spinner.tsx` 생성
+  - `AiOutlineLoading3Quarters` 아이콘 사용 (react-icons)
+  - 크기 옵션: sm, md, lg
+  - `animate-spin` 애니메이션
+  - className prop으로 색상 커스터마이징 가능
+
+**2. Dashboard Loading States:**
+- `components/passages/passage-list.tsx` 업데이트
+  - 로딩 중: 3개의 card skeleton 표시
+  - 그리드 레이아웃 유지 (md:grid-cols-2 lg:grid-cols-3)
+  - 에러 상태 유지 (Try again 버튼 포함)
+  - Empty state 유지
+
+**3. Question Bank Loading States:**
+- `components/bank/bank-table.tsx` 업데이트
+  - 로딩 중: 5개의 table-row skeleton 표시
+  - Table header는 로딩 중에도 항상 표시
+  - 7개 컬럼 구조와 정확히 일치하는 skeleton
+
+**4. Button Loading States 추가:**
+
+**passage-form.tsx (Create/Update 버튼):**
+- `Spinner` 컴포넌트 사용
+- 로딩 텍스트: "Creating..." / "Updating..."
+- 버튼 비활성화로 double-click 방지
+- `FiLoader` → `Spinner` 교체
+
+**generation-settings.tsx (Generate 버튼):**
+- 커스텀 spinner → `Spinner` 컴포넌트로 교체
+- 로딩 텍스트: "Generating..."
+- `text-white` className으로 흰색 spinner
+
+**app/(app)/passage/[id]/page.tsx (Save 버튼):**
+- `FiLoader` → `Spinner` 컴포넌트로 교체
+- 로딩 텍스트: "Saving..."
+- Passage 로딩 상태도 `Spinner`로 개선
+
+**bank-row.tsx (Delete 버튼):**
+- `FiLoader` → `Spinner` 컴포넌트로 교체
+- 로딩 중 spinner 표시
+- 버튼 비활성화 및 색상 변경 (gray)
+
+**5. Generation Screen Loader 개선:**
+- `components/generation/generation-loader.tsx` 업데이트
+- 커스텀 spinner → `Spinner` 컴포넌트 (size="lg")
+- 일관된 디자인 및 애니메이션
+
+**빌드 검증:**
+```bash
+npm run build
+```
+- ✅ No linter errors
+- ✅ TypeScript 컴파일 성공
+- ✅ 프로덕션 빌드 성공
+- ✅ 모든 라우트 정상 작동
+
+### 수정 (Refinement):
+
+**Skeleton Loader 디자인:**
+- Card: 제목(6h, 3/4w) + 3줄 내용(4h) + 푸터(날짜 + 버튼)
+- Question: 헤더(뱃지 + 아이콘) + 질문(2줄) + 4개 옵션(10h each) + Evidence
+- Table Row: 7개 컬럼에 맞춘 skeleton (title, grade, difficulty, count, types, date, actions)
+- Text: 기본 3줄 텍스트 skeleton
+
+**Spinner 컴포넌트:**
+```typescript
+interface SpinnerProps {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+// Size classes
+sm: 'text-base'   // 버튼 안에 사용
+md: 'text-xl'     // 일반 로딩
+lg: 'text-3xl'    // Full-screen 로딩
+```
+
+**Button Loading Pattern:**
+```tsx
+<button disabled={loading}>
+  {loading ? (
+    <>
+      <Spinner size="sm" />
+      Loading Text...
+    </>
+  ) : (
+    <>
+      <Icon />
+      Button Text
+    </>
+  )}
+</button>
+```
+
+**레이아웃 Shift 방지:**
+- 버튼 크기 고정 (spinner와 아이콘 크기 동일)
+- Skeleton이 실제 콘텐츠와 동일한 구조
+- Loading 상태 전환 시 요소 크기 유지
+
+**Double-Click 방지:**
+- 모든 액션 버튼에 `disabled={loading}` 적용
+- 로딩 중 버튼 opacity 감소 또는 색상 변경
+- Cursor: not-allowed
+
+**일관성:**
+- 모든 spinner는 `AiOutlineLoading3Quarters` 사용
+- `animate-spin` 애니메이션 (Tailwind)
+- Slate/blue 색상 스킴 유지
+- react-icons 사용 (lucide-react 사용 안 함)
+
+**파일 구조:**
+```
+components/shared/
+  ├── skeleton-loader.tsx    # 새로 생성 (4 variants)
+  └── spinner.tsx            # 새로 생성 (재사용 가능)
+
+업데이트된 컴포넌트:
+  ├── passages/passage-list.tsx
+  ├── passages/passage-form.tsx
+  ├── bank/bank-table.tsx
+  ├── bank/bank-row.tsx
+  ├── generation/generation-settings.tsx
+  └── generation/generation-loader.tsx
+
+업데이트된 페이지:
+  └── app/(app)/passage/[id]/page.tsx
+```
+
+**Loading States 적용 위치:**
+- ✅ Dashboard: Passage list loading
+- ✅ Question Bank: Table rows loading
+- ✅ Create Passage: Submit button loading
+- ✅ Generate Questions: Generate button loading
+- ✅ Save Question Set: Save button loading
+- ✅ Delete Question Set: Delete button loading
+- ✅ Generation Screen: Full-screen loader
+- ✅ Passage Detail: Passage loading
+
+**성능 개선:**
+- Skeleton 개수 적절히 제한 (3-5개)
+- 애니메이션 부드럽게 (Tailwind 기본값)
+- 불필요한 리렌더링 방지
+
+**사용자 피드백:**
+- 구체적인 로딩 텍스트:
+  - "Creating..." (생성 중)
+  - "Updating..." (업데이트 중)
+  - "Generating..." (생성 중)
+  - "Saving..." (저장 중)
+  - "Loading passage..." (로딩 중)
+- Skeleton으로 콘텐츠 구조 미리 표시
+- 에러 발생 시 "Try again" 버튼 제공
+
+**다음 단계:**
+- Phase 3 Task 5: Regenerate Feature Enhancement
+- Phase 3 Task 6: Question Bank Enhancements
+- Phase 3 Task 4: Documentation Updates
+
+
+## 24. Phase 3 Task 5 & 6: Regenerate Feature Polish + AlertDialog Implementation
+
+### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor Agent)
+
+### 의도 (Intent):
+Task 5 (Regenerate Feature Enhancement)와 Task 6 (Question Bank Enhancements)를 완료. Regenerate 기능은 이미 완벽하게 구현되어 있어 검증만 수행. 주요 작업은 브라우저 `confirm()` 다이얼로그를 전문적인 AlertDialog 컴포넌트로 교체하여 UX 일관성 개선 및 로딩 상태 표시.
+
+### 프롬프트 (Prompt):
+"Task 5: Regenerate Feature Enhancement (선택적) 이미 부분적으로 구현됨 로딩 상태는 Task 3에서 완료 개선 가능한 부분이 있으면 polish
+
+Task 6: Question Bank Enhancements (선택적) Empty states 개선 (이미 대부분 구현됨) Delete confirmation dialog (confirm() → AlertDialog로 교체)
+
+이것부터 먼저하자."
+
+### 검증 (Verification):
+
+**Task 5: Regenerate Feature 검증**
+
+**기존 구현 상태 확인:**
+- ✅ `app/(app)/passage/[id]/page.tsx`:
+  - `handleRegenerateQuestion()` 완벽 구현
+  - 로딩 상태: `regeneratingQuestionId` state 관리
+  - Toast 알림: 성공/실패 피드백
+  - 에러 처리: try-catch + 사용자 친화적 메시지
+  
+- ✅ `components/generation/validation-screen.tsx`:
+  - Regenerate 버튼에 로딩 spinner (FiRefreshCw + animate-spin)
+  - 로딩 중 버튼 비활성화
+  - 텍스트 변경: "Regenerating..."
+
+- ✅ API 통합:
+  - `/api/generate` 호출로 단일 질문 생성 (count: 1)
+  - 동일한 설정 유지 (difficulty, type)
+  - 기존 질문 ID 유지하여 교체
+
+**결론**: Task 5는 이미 완벽하게 구현되어 있어 추가 작업 불필요 ✅
+
+---
+
+**Task 6: AlertDialog 구현**
+
+**1. AlertDialog 컴포넌트 생성:**
+- `components/ui/alert-dialog.tsx` 생성 (148 lines)
+
+**Props 인터페이스:**
+```typescript
+interface AlertDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  cancelText?: string;
+  confirmText?: string;
+  variant?: 'danger' | 'warning' | 'info';
+  onConfirm: () => void;
+  isLoading?: boolean;
+}
+```
+
+**주요 기능:**
+- **Variants**: danger (red), warning (amber), info (blue)
+- **Icons**: MdWarning 아이콘 (react-icons)
+- **Backdrop**: 반투명 black/50 overlay
+- **Animations**: 
+  - fadeIn (backdrop)
+  - scaleIn (dialog) 
+  - 모두 CSS keyframes 사용
+- **Loading State**: 
+  - `isLoading` prop으로 제어
+  - Confirm 버튼에 spinner 표시
+  - 로딩 중 모든 버튼 비활성화
+  - 백드롭 클릭 방지
+- **Accessibility**:
+  - X 버튼으로 닫기
+  - Cancel 버튼
+  - 백드롭 클릭으로 닫기 (로딩 중 제외)
+  - 키보드 네비게이션 지원
+
+**디자인:**
+- Slate/blue 색상 스킴 유지
+- 둥근 모서리 (rounded-xl)
+- 그림자 (shadow-2xl)
+- 최대 너비: max-w-md
+- 반응형: 모바일 mx-4 padding
+
+**2. passage-card.tsx 업데이트:**
+- `confirm()` 제거
+- AlertDialog import 및 state 추가:
+  ```typescript
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  ```
+- `handleDelete()` 분리:
+  - `handleDelete`: 다이얼로그 표시
+  - `handleConfirmDelete`: 실제 삭제 로직
+- AlertDialog 통합:
+  ```tsx
+  <AlertDialog
+    open={showDeleteDialog}
+    onOpenChange={setShowDeleteDialog}
+    title="Delete Passage"
+    description="Are you sure you want to delete this passage? This action cannot be undone."
+    confirmText="Delete"
+    cancelText="Cancel"
+    variant="danger"
+    onConfirm={handleConfirmDelete}
+    isLoading={isDeleting}
+  />
+  ```
+
+**3. bank-table.tsx 업데이트:**
+- `confirm()` 제거
+- State 추가:
+  ```typescript
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [questionSetToDelete, setQuestionSetToDelete] = useState<string | null>(null);
+  ```
+- 함수 분리:
+  - `handleDelete(id)`: 다이얼로그 표시 + ID 저장
+  - `handleConfirmDelete()`: 실제 삭제 로직
+- AlertDialog 렌더링:
+  - 테이블 외부에 배치
+  - 로딩 중 confirm 버튼 spinner 표시
+  - 삭제 완료 후 자동으로 다이얼로그 닫기
+
+**4. Empty States 검증:**
+- ✅ `components/shared/empty-state.tsx`: 이미 완벽하게 구현됨
+- ✅ `components/passages/passage-list.tsx`: FiFileText 아이콘 + 안내 메시지
+- ✅ `components/bank/bank-table.tsx`: 
+  - 데이터 없음: FiDatabase 아이콘 + "No questions saved yet..."
+  - 필터 결과 없음: "No question sets match the current filters..."
+
+**빌드 검증:**
+```bash
+npm run build
+```
+- ✅ No linter errors
+- ✅ TypeScript 컴파일 성공
+- ✅ 프로덕션 빌드 성공
+- ✅ 모든 라우트 정상 작동
+
+### 수정 (Refinement):
+
+**AlertDialog vs Browser confirm() 비교:**
+
+| 항목 | Browser confirm() | AlertDialog |
+|------|------------------|-------------|
+| 디자인 | 브라우저 기본 (못생김) | 커스텀 디자인 (세련됨) |
+| 로딩 상태 | 불가능 | Spinner 표시 가능 |
+| 스타일링 | 불가능 | 완전한 커스터마이징 |
+| Variants | 없음 | danger/warning/info |
+| 애니메이션 | 없음 | fadeIn/scaleIn |
+| 색상 일관성 | 없음 | Slate/blue 스킴 유지 |
+| 사용자 경험 | 나쁨 | 훌륭함 |
+
+**로딩 상태 처리:**
+```typescript
+// AlertDialog는 비동기 작업 중 시각적 피드백 제공
+<AlertDialog
+  isLoading={isDeleting}  // Spinner 표시
+  onConfirm={handleConfirmDelete}  // 비동기 함수
+/>
+
+// handleConfirmDelete에서 처리:
+// 1. setIsDeleting(true)
+// 2. API 호출
+// 3. Toast 알림
+// 4. Dialog 닫기: setShowDeleteDialog(false)
+// 5. setIsDeleting(false)
+```
+
+**삭제 워크플로우:**
+1. 사용자가 Delete 버튼 클릭
+2. AlertDialog 표시 (variant="danger", 빨간색)
+3. "Delete" 버튼 클릭
+4. Spinner 표시 + 버튼 비활성화
+5. API 호출 (DELETE request)
+6. 성공: Toast 알림 + Dialog 닫기 + 목록 갱신
+7. 실패: Error toast + Dialog 유지 (재시도 가능)
+
+**애니메이션 타이밍:**
+- fadeIn: 0.15s ease-out (backdrop)
+- scaleIn: 0.15s ease-out (dialog)
+- 부드럽고 빠른 전환으로 반응성 좋음
+
+**파일 구조:**
+```
+components/ui/
+  └── alert-dialog.tsx          # 새로 생성 (재사용 가능)
+
+업데이트된 컴포넌트:
+  ├── passages/passage-card.tsx
+  └── bank/bank-table.tsx
+```
+
+**사용 패턴:**
+```typescript
+// 1. State 추가
+const [showDialog, setShowDialog] = useState(false);
+const [isLoading, setIsLoading] = useState(false);
+
+// 2. 클릭 핸들러
+const handleDelete = () => setShowDialog(true);
+
+// 3. Confirm 핸들러 (비동기)
+const handleConfirm = async () => {
+  setIsLoading(true);
+  try {
+    await deleteItem();
+    toast({ variant: 'success' });
+    setShowDialog(false);
+  } catch (err) {
+    toast({ variant: 'error' });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// 4. AlertDialog 렌더링
+<AlertDialog
+  open={showDialog}
+  onOpenChange={setShowDialog}
+  title="Delete Item"
+  description="Are you sure? This cannot be undone."
+  variant="danger"
+  onConfirm={handleConfirm}
+  isLoading={isLoading}
+/>
+```
+
+**confirm() 사용 위치 제거:**
+- ✅ `components/passages/passage-card.tsx` (passage 삭제)
+- ✅ `components/bank/bank-table.tsx` (question set 삭제)
+- ✅ 모든 confirm() 완전히 제거됨
+
+**다음 단계:**
+- Phase 3 Task 4: Documentation Updates (README, .env.example)
+- Phase 3 Task 7: Deployment Preparation (Vercel)
+- Phase 3 Task 8: Final QA
+
+
 ## 22. My Question Bank 필터링 기능 구현
 
 ### 사용 모델 (Model): Claude Sonnet 4.5 (Cursor)

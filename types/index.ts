@@ -41,6 +41,7 @@ export interface QuestionSetWithPassage extends QuestionSet {
   passage: {
     id: string;
     title: string;
+    content: string;
     grade_level: GradeLevel;
   };
 }

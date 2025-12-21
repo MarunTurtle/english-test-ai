@@ -51,7 +51,7 @@ export async function getQuestionSetById(
     .from('question_sets')
     .select(`
       *,
-      passage:passages(id, title, grade_level)
+      passage:passages(id, title, content, grade_level)
     `)
     .eq('id', id)
     .eq('user_id', userId)
