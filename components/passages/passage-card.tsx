@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Passage } from '@/types/passage';
 import { FiEye, FiTrash2, FiCalendar } from 'react-icons/fi';
 import { GRADE_LEVELS } from '@/lib/constants/grade-levels';
+import { useToast } from '@/hooks/shared/use-toast';
 
 interface PassageCardProps {
   passage: Passage;
@@ -13,6 +14,7 @@ interface PassageCardProps {
 
 export function PassageCard({ passage, onDelete }: PassageCardProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const gradeLabel = GRADE_LEVELS.find(g => g.value === passage.grade_level)?.label || passage.grade_level;
@@ -45,12 +47,22 @@ export function PassageCard({ passage, onDelete }: PassageCardProps) {
         throw new Error('Failed to delete passage');
       }
 
+      toast({
+        title: 'Passage deleted',
+        description: 'The passage has been successfully deleted.',
+        variant: 'success',
+      });
+
       if (onDelete) {
         onDelete(passage.id);
       }
     } catch (error) {
       console.error('Error deleting passage:', error);
-      alert('Failed to delete passage');
+      toast({
+        title: 'Deletion failed',
+        description: 'Failed to delete passage. Please try again.',
+        variant: 'error',
+      });
     } finally {
       setIsDeleting(false);
     }

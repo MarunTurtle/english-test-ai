@@ -10,12 +10,14 @@ import { GenerationLoader } from "@/components/generation/generation-loader";
 import { ValidationScreen } from "@/components/generation/validation-screen";
 import type { GenerationSettings as GenerationSettingsType, Question } from "@/types/question";
 import { FiLoader, FiAlertCircle, FiChevronLeft, FiSave, FiEdit2, FiCheckCircle } from "react-icons/fi";
+import { useToast } from "@/hooks/shared/use-toast";
 
 type WorkflowPhase = 'input' | 'generating' | 'results';
 
 export default function PassageDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { toast } = useToast();
   const passageId = params?.id as string;
   const { passage, loading, error } = usePassage(passageId);
   const { generateQuestions, isGenerating, error: generateError } = useGenerateQuestions();
@@ -49,11 +51,21 @@ export default function PassageDetailPage() {
 
       setQuestions(generatedQuestions);
       setPhase('results');
+      
+      toast({
+        title: 'Questions generated',
+        description: `Successfully generated ${generatedQuestions.length} questions.`,
+        variant: 'success',
+      });
     } catch (err) {
       console.error('Generation failed:', err);
       // Stay on input phase if generation fails
       setPhase('input');
-      alert(`Failed to generate questions: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast({
+        title: 'Generation failed',
+        description: err instanceof Error ? err.message : 'Failed to generate questions. Please try again.',
+        variant: 'error',
+      });
     }
   };
 
@@ -64,12 +76,22 @@ export default function PassageDetailPage() {
 
   const handleSave = async () => {
     if (!passage) return;
+    
+    // Validate we have questions to save
+    if (questions.length === 0) {
+      toast({
+        title: 'No questions to save',
+        description: 'Please generate questions first.',
+        variant: 'warning',
+      });
+      return;
+    }
 
     try {
       const questionSet = await saveQuestionSet({
         passage_id: passage.id,
         difficulty: settings.difficulty,
-        question_count: settings.questionCount,
+        question_count: questions.length, // Use actual question count, not settings
         question_types: settings.questionTypes,
         payload: {
           questions,
@@ -77,13 +99,19 @@ export default function PassageDetailPage() {
             grade_level: passage.grade_level,
             difficulty: settings.difficulty,
             question_types: settings.questionTypes,
-            question_count: settings.questionCount,
+            question_count: questions.length, // Use actual question count
           },
         },
       });
 
       if (questionSet) {
-        // Show success message
+        toast({
+          title: 'Question set saved',
+          description: 'Your question set has been saved to the Question Bank.',
+          variant: 'success',
+        });
+        
+        // Show success message briefly then navigate
         setShowSaveSuccess(true);
         setTimeout(() => {
           setShowSaveSuccess(false);
@@ -93,7 +121,11 @@ export default function PassageDetailPage() {
       }
     } catch (err) {
       console.error('Save failed:', err);
-      alert(`Failed to save question set: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast({
+        title: 'Save failed',
+        description: err instanceof Error ? err.message : 'Failed to save question set. Please try again.',
+        variant: 'error',
+      });
     }
   };
 
@@ -131,10 +163,20 @@ export default function PassageDetailPage() {
         setQuestions((prev) =>
           prev.map((q) => (q.id === questionId ? { ...newQuestions[0], id: questionId } : q))
         );
+        
+        toast({
+          title: 'Question regenerated',
+          description: 'The question has been successfully regenerated.',
+          variant: 'success',
+        });
       }
     } catch (err) {
       console.error('Regeneration failed:', err);
-      alert(`Failed to regenerate question: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast({
+        title: 'Regeneration failed',
+        description: err instanceof Error ? err.message : 'Failed to regenerate question. Please try again.',
+        variant: 'error',
+      });
     } finally {
       // Clear loading state
       setRegeneratingQuestionId(null);
@@ -266,11 +308,11 @@ export default function PassageDetailPage() {
                 Saved Successfully!
               </div>
             ) : (
-              <button
-                onClick={handleSave}
+            <button
+              onClick={handleSave}
                 disabled={isSaving}
                 className="px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
+            >
                 {isSaving ? (
                   <>
                     <FiLoader className="w-4 h-4 animate-spin" />
@@ -278,11 +320,11 @@ export default function PassageDetailPage() {
                   </>
                 ) : (
                   <>
-                    <FiSave className="w-4 h-4" />
-                    Save Question Set
+              <FiSave className="w-4 h-4" />
+              Save Question Set
                   </>
                 )}
-              </button>
+            </button>
             )}
           </div>
         </div>

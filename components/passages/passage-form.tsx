@@ -7,6 +7,7 @@ import { useUpdatePassage } from '@/hooks/passages/use-update-passage';
 import { GRADE_LEVELS, GradeLevel } from '@/lib/constants/grade-levels';
 import { FiAlertCircle, FiLoader } from 'react-icons/fi';
 import { Passage } from '@/types/passage';
+import { useToast } from '@/hooks/shared/use-toast';
 
 const MIN_CHARS = 100;
 const MAX_CHARS = 10000;
@@ -18,6 +19,7 @@ interface PassageFormProps {
 
 export function PassageForm({ mode = 'create', initialPassage }: PassageFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const { createPassage, loading: createLoading, error: createError } = useCreatePassage();
   const { updatePassage, loading: updateLoading, error: updateError } = useUpdatePassage();
   
@@ -61,8 +63,19 @@ export function PassageForm({ mode = 'create', initialPassage }: PassageFormProp
       });
 
       if (passage) {
+        toast({
+          title: 'Passage created',
+          description: 'Your passage has been successfully created.',
+          variant: 'success',
+        });
         // Redirect to workbench
         router.push(`/passage/${passage.id}`);
+      } else if (createError) {
+        toast({
+          title: 'Creation failed',
+          description: createError || 'Failed to create passage. Please try again.',
+          variant: 'error',
+        });
       }
     } else if (mode === 'edit' && initialPassage) {
       // Update existing passage
@@ -73,8 +86,19 @@ export function PassageForm({ mode = 'create', initialPassage }: PassageFormProp
       });
 
       if (updatedPassage) {
+        toast({
+          title: 'Passage updated',
+          description: 'Your passage has been successfully updated.',
+          variant: 'success',
+        });
         // Redirect back to passage detail
         router.push(`/passage/${updatedPassage.id}`);
+      } else if (updateError) {
+        toast({
+          title: 'Update failed',
+          description: updateError || 'Failed to update passage. Please try again.',
+          variant: 'error',
+        });
       }
     }
   };

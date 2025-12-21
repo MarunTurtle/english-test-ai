@@ -5,9 +5,11 @@ import { useQuestionSets } from '@/hooks/questions/use-question-sets';
 import { BankRow } from './bank-row';
 import { EmptyState } from '@/components/shared/empty-state';
 import { FiDatabase, FiLoader } from 'react-icons/fi';
+import { useToast } from '@/hooks/shared/use-toast';
 
 export function BankTable() {
   const { questionSets, loading, error, refetch } = useQuestionSets();
+  const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
@@ -26,11 +28,21 @@ export function BankTable() {
         throw new Error(errorData.error || 'Failed to delete question set');
       }
 
+      toast({
+        title: 'Question set deleted',
+        description: 'The question set has been successfully deleted.',
+        variant: 'success',
+      });
+
       // Refetch the list
       await refetch();
     } catch (err) {
       console.error('Error deleting question set:', err);
-      alert('Failed to delete question set. Please try again.');
+      toast({
+        title: 'Deletion failed',
+        description: 'Failed to delete question set. Please try again.',
+        variant: 'error',
+      });
     } finally {
       setDeletingId(null);
     }
