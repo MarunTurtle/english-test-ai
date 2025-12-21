@@ -76,7 +76,9 @@ export async function createOpenAIResponse(
     const completion = await openai.chat.completions.create({
       model,
       messages: chatMessages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-      temperature: 0.7,
+      // Note: gpt-5-mini only supports temperature: 1 (default)
+      // For other models, you can specify temperature: 0.7
+      ...(model !== 'gpt-5-mini' && { temperature: 0.7 }),
       response_format: { type: 'json_object' }, // Ensure JSON output
     });
 

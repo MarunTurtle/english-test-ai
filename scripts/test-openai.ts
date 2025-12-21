@@ -42,7 +42,7 @@ async function testOpenAIConnection() {
 
   try {
     console.log('📝 Test Configuration:');
-    console.log('   - Model: gpt-4o-mini');
+    console.log('   - Model: gpt-5-mini');
     console.log('   - Grade Level: M2');
     console.log('   - Difficulty: Medium');
     console.log('   - Question Count: 2');
@@ -66,12 +66,12 @@ async function testOpenAIConnection() {
     const startTime = Date.now();
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-mini',
       messages: [
         { role: 'system', content: GENERATION_SYSTEM_PROMPT },
         { role: 'user', content: userPrompt },
       ],
-      temperature: 0.7,
+      // GPT-5 mini only supports temperature: 1 (default)
       response_format: { type: 'json_object' },
     });
 
