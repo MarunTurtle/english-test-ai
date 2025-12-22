@@ -4,6 +4,7 @@
 
 한국 중학교 영어 교사를 위한 특화된 AI 워크벤치로, 지문 기반 고품질 객관식 문제를 생성하고 근거 기반 검증 및 전문적인 검토 워크플로우를 제공합니다.
 
+[![CI](https://github.com/marun/english-question-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/marun/english-question-generator/actions/workflows/ci.yml)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -597,12 +598,12 @@ Vercel이 자동으로 배포:
 ## 💡 11. 향후 개선 계획
 
 ### Phase 4 (향후 개발)
+- [ ] 문제 PDF, Word(.docx), HWP 내보내기
 - [ ] Unit Test 추가 (Vitest)
 - [ ] E2E Test (Playwright)
 - [ ] GitHub Actions CI/CD
-- [ ] 문제 PDF 내보내기
-- [ ] 문제 템플릿 관리
-- [ ] 협업 기능 (문제 공유)
+- [ ] Questions table 정규화 (현재 JSONB → 개별 테이블)
 - [ ] 통계 대시보드 (문제 생성 이력)
+- [ ] 협업 기능 (문제 공유)
 
 ---

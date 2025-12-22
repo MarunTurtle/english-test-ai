@@ -24,12 +24,20 @@ export function PassageForm({ mode = 'create', initialPassage }: PassageFormProp
   const { createPassage, loading: createLoading, error: createError } = useCreatePassage();
   const { updatePassage, loading: updateLoading, error: updateError } = useUpdatePassage();
   
-  const [content, setContent] = useState('');
-  const [gradeLevel, setGradeLevel] = useState<GradeLevel>('M2');
-  const [title, setTitle] = useState('');
+  const [content, setContent] = useState(
+    mode === 'edit' && initialPassage ? initialPassage.content : ''
+  );
+  const [gradeLevel, setGradeLevel] = useState<GradeLevel>(
+    mode === 'edit' && initialPassage ? (initialPassage.grade_level as GradeLevel) : 'M2'
+  );
+  const [title, setTitle] = useState(
+    mode === 'edit' && initialPassage ? initialPassage.title : ''
+  );
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Initialize form with existing passage data if in edit mode
+  // Update form when initialPassage changes (e.g., after refetch)
+  // Note: This is intentional - we need to sync form state when initialPassage changes
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (mode === 'edit' && initialPassage) {
       setContent(initialPassage.content);
@@ -37,6 +45,7 @@ export function PassageForm({ mode = 'create', initialPassage }: PassageFormProp
       setTitle(initialPassage.title);
     }
   }, [mode, initialPassage]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const loading = mode === 'create' ? createLoading : updateLoading;
   const apiError = mode === 'create' ? createError : updateError;

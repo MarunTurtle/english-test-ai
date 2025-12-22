@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Documentation and prototype files
+    "docs/prototype_code.tsx",
   ]),
 ]);
 

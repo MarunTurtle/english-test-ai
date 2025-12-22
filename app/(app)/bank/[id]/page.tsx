@@ -314,7 +314,7 @@ export default function QuestionSetDetailPage() {
                         Evidence from Passage
                       </p>
                       <p className="text-sm text-blue-900 italic leading-relaxed">
-                        "{question.evidence}"
+                        &quot;{question.evidence}&quot;
                       </p>
                     </div>
                   )}
