@@ -14,13 +14,9 @@
 
 ## 📖 1. 프로젝트 소개
 
-EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선시하는 교실용 AI 문항 생성기입니다. 시스템은 교사가 신뢰하고 검토하며 편집하고 최종 확정할 수 있는 결과물을 생성합니다.
+EnglishTestAI는 **교사 주도 - Teacher Control**를 우선시하는 교실용 AI 문항 생성기입니다. AI가 생성한 문항을 교사가 검토하며 편집하고 최종 확정하여 문제 은행을 생성합니다.
 
-### 핵심 미션
-
-**"AI 마법" → "교사 주도"로의 전환**
-
-기존 AI 생성기는 투명성이나 근거 없이 문제를 생성합니다. EnglishTestAI는 원문 지문에서 **근거 인용구**를 포함한 문제를 생성하여, 교사가 품질을 검증하고 정보에 기반한 결정을 내릴 수 있도록 합니다.
+기존 AI 생성기는 교사의 검증 및 편집 기능이 부재합니다. EnglishTestAI는 원문 지문에서 **근거 인용구**를 포함한 문제를 생성하여, 교사가 품질을 검증하고 정보에 기반한 결정을 내릴 수 있도록 돕습니다.
 
 ### 대상 사용자
 
@@ -32,27 +28,27 @@ EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선�
 
 1. **근거 기반 검증**: 모든 생성된 문제에 지문의 직접 인용구가 근거로 포함됨
 2. **교사 주도**: 교사가 각 문제를 검토하고 특정 피드백과 함께 승인/거부
-3. **전문 워크플로우**: 교실 사용을 위해 설계된 입력 → 생성 → 검토 → 저장 워크플로우
+3. **워크플로우**: 교실 사용을 위해 설계된 입력 → 생성 → 검토 → 저장 워크플로우
 
 ---
 
-## ✅ 2. 구현 기능 (필수 요건 체크리스트)
+## 2. 구현 기능 (필수 요건 체크리스트)
 
 ### 핵심 기능
 
-- ✅ **사용자 인증**
+- **사용자 인증**
   - Google OAuth 로그인/로그아웃
   - 세션 관리 및 보안
   - 사용자별 데이터 격리
 
-- ✅ **지문 관리 (CRUD)**
+- **지문 관리 (CRUD)**
   - 영어 지문 생성 및 저장
   - 지문 목록 조회 (대시보드)
   - 지문 상세 보기 및 수정
   - 지문 삭제 (확인 대화 상자)
   - AI 기반 제목 자동 생성
 
-- ✅ **AI 문제 생성**
+- **AI 문제 생성**
   - OpenAI GPT-4o-mini 통합
   - 다양한 설정 옵션:
     - 학년 선택 (중1, 중2, 중3)
@@ -62,21 +58,21 @@ EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선�
   - 구조화된 JSON 출력 (Zod 검증)
   - 근거 인용구 자동 추출
 
-- ✅ **문제 검토 및 편집**
+- **문제 검토 및 편집**
   - 생성된 문제 미리보기
   - 근거 인용구 표시
   - 검증 상태 (PASS/NEEDS_FIX) 및 피드백
   - 개별 문제 수동 편집
   - 개별 문제 재생성 (AI 기반)
 
-- ✅ **문제 세트 관리**
+- **문제 세트 관리**
   - 문제 세트 저장 (JSONB 형식)
   - 문제 세트 목록 조회
   - 문제 세트 상세 보기
   - 문제 세트 삭제
   - 지문별 문제 세트 필터링
 
-- ✅ **문제 은행**
+- **문제 은행**
   - 저장된 모든 문제 세트 조회
   - 다중 필터 기능:
     - 학년별 필터
@@ -85,7 +81,7 @@ EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선�
   - 문제 세트 메타데이터 표시
   - 빠른 조회 및 삭제
 
-- ✅ **UI/UX**
+- **UI/UX**
   - 반응형 디자인 (모바일, 태블릿, 데스크톱)
   - 사이드바 네비게이션
   - 토스트 알림 시스템
@@ -94,48 +90,43 @@ EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선�
   - 빈 상태 (Empty State) 컴포넌트
   - 확인 대화 상자 (중요 작업)
 
-- ✅ **데이터베이스**
+- **데이터베이스**
   - Supabase PostgreSQL
   - Row Level Security (RLS)
   - 사용자별 데이터 보안
   - 효율적인 쿼리 및 인덱싱
 
-- ✅ **배포 및 운영**
+- **배포 및 운영**
   - Vercel 배포 완료
   - 환경 변수 관리
   - 프로덕션 최적화
-  - CI/CD 자동화
+  - 브랜치별 CI/CD 자동화
 
 ---
 
 ## 🛠️ 3. 기술 스택
 
 ### 프레임워크 및 언어
-
 - **Next.js 16.1** - App Router, Server Components, API Routes
 - **TypeScript 5.0** - 타입 안정성 및 개발자 경험 향상
 - **React 19** - 최신 React 기능 활용
 
 ### UI 및 스타일링
-
 - **Tailwind CSS 4** - 유틸리티 우선 CSS 프레임워크
 - **react-icons** - 아이콘 라이브러리
 - **커스텀 컴포넌트** - shadcn/ui 스타일 컴포넌트 시스템
 
 ### 백엔드 및 데이터베이스
-
 - **Supabase** - PostgreSQL 데이터베이스 + 인증
 - **Row Level Security (RLS)** - 데이터 보안 및 격리
 - **Supabase Auth** - Google OAuth 통합
 
 ### AI 통합
-
 - **OpenAI API** - GPT-4o-mini 모델
 - **구조화된 출력** - JSON 기반 응답 파싱
 - **Zod** - 런타임 스키마 검증 및 타입 안전성
 
 ### 배포 및 호스팅
-
 - **Vercel** - 서버리스 배포 플랫폼
 - **Edge Functions** - 빠른 API 응답
 
@@ -158,27 +149,23 @@ EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선�
 - **클라이언트**: React 컴포넌트, 커스텀 훅, 상태 관리
 - **API 레이어**: Next.js API Routes (서버 사이드)
 - **데이터베이스**: Supabase PostgreSQL (RLS 적용)
-- **AI 서비스**: OpenAI API (문제 생성)
+- **AI 서비스**: OpenAI API (문제 및 제목 생성)
 
 ---
-
 ## 🚀 4. 로컬 실행 방법
 
 ### 시스템 요구사항
-
 - **Node.js 18.x 이상**
 - **npm** / yarn / pnpm
 - **Git**
 
 ### 필요한 계정
-
-1. **Supabase 계정** - [supabase.com에서 가입](https://supabase.com)
+1. **Supabase 계정** - [supabase.com 가입](https://supabase.com)
 2. **OpenAI API 키** - [platform.openai.com에서 발급](https://platform.openai.com/api-keys)
-3. **Google OAuth** - Supabase Auth 설정에서 구성
+3. **Google OAuth** - [Cloud Console에 redirect url 추가 필요](https://console.cloud.google.com)
 
 ### 설치 및 실행
-
-#### 1. 저장소 복제
+#### 1. 레포지토리 클론
 
 ```bash
 git clone https://github.com/[your-username]/english-test-ai.git
@@ -186,7 +173,6 @@ cd english-test-ai
 ```
 
 #### 2. 의존성 설치
-
 ```bash
 npm install
 # 또는
@@ -196,9 +182,7 @@ pnpm install
 ```
 
 #### 3. 환경 변수 설정
-
 프로젝트 루트에 `.env.local` 파일을 생성하고 다음 내용을 추가:
-
 ```bash
 # Supabase 설정
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
@@ -212,7 +196,6 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 **환경 변수 발급 방법:**
-
 1. **Supabase 인증 정보**
    - [supabase.com](https://supabase.com)에서 프로젝트 생성
    - Settings → API → Project URL → `NEXT_PUBLIC_SUPABASE_URL`
@@ -226,14 +209,12 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 #### 4. Supabase 데이터베이스 설정
 
 **데이터베이스 스키마 실행:**
-
 1. Supabase 대시보드의 **SQL Editor**로 이동
 2. 이 저장소의 `docs/supabase_schema.sql` 파일 내용 복사
 3. SQL 편집기에 붙여넣고 **RUN** 클릭
 4. 모든 테이블, RLS 정책, 트리거가 생성됨
 
 **Google OAuth 활성화:**
-
 1. Supabase 대시보드 → **Authentication** → **Providers**
 2. **Google** 활성화
 3. Redirect URL 추가: `http://localhost:3000/auth/callback`
@@ -241,7 +222,6 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 자세한 데이터베이스 구조는 아래 [5. 데이터베이스 스키마](#-5-데이터베이스-스키마) 섹션 참조
 
 #### 5. 개발 서버 실행
-
 ```bash
 npm run dev
 ```
@@ -249,7 +229,6 @@ npm run dev
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 앱 확인
 
 ### 기타 명령어
-
 ```bash
 # 프로덕션 빌드
 npm run build
@@ -268,7 +247,6 @@ npm run test:title
 ```
 
 ---
-
 ## 💾 5. 데이터베이스 스키마
 
 EnglishTestAI는 Supabase (PostgreSQL)를 사용하며, 다음과 같은 테이블 구조를 가집니다.
@@ -459,15 +437,13 @@ CREATE INDEX idx_question_sets_passage_id ON question_sets(passage_id);
 - 검증 상태 (PASS / NEEDS_FIX)
 
 **수행 가능한 작업:**
-
 - **수동 편집**: "편집"을 클릭하여 필드 수정
 - **재생성**: "재생성"을 클릭하여 단일 문제의 새 버전 생성
 - **검토 상태**: 문제가 검증을 통과했는지 수정이 필요한지 확인
 - **저장**: 모든 문제에 만족하면 "문제 세트 저장" 클릭
 
 ### 5. 문제 은행 관리
-
-1. 사이드바에서 **"문제 은행"**으로 이동
+1. 사이드바에서 **문제 은행**으로 이동
 2. 저장된 모든 문제 세트 조회
 3. 필터링:
    - 학년 (중1, 중2, 중3)
@@ -485,14 +461,10 @@ english-test-ai/
 ├── app/                      # Next.js App Router
 │   ├── (app)/               # 보호된 라우트 (인증 필요)
 │   │   ├── dashboard/       # 지문 목록 및 개요
-│   │   ├── passage/[id]/    # 문제 생성 워크벤치
+│   │   ├── passage/         # 지문 관리
 │   │   ├── bank/            # 문제 은행 (저장된 세트)
-│   │   └── layout.tsx       # 사이드바가 있는 앱 레이아웃
 │   ├── (auth)/              # 인증 라우트 (로그인)
 │   ├── api/                 # API 라우트 핸들러
-│   │   ├── passages/        # 지문 CRUD
-│   │   ├── generate/        # 문제 생성
-│   │   └── question-sets/   # 문제 세트 CRUD
 │   ├── auth/callback/       # OAuth 콜백 핸들러
 │   └── layout.tsx           # 루트 레이아웃
 ├── components/              # React 컴포넌트
@@ -501,8 +473,10 @@ english-test-ai/
 │   ├── questions/          # 문제 표시 및 편집
 │   ├── generation/         # 생성 워크플로우 UI
 │   ├── bank/              # 문제 은행 UI
+│   ├── layout/            # 레이아웃 컴포넌트 (Sidebar 등)
 │   ├── shared/            # 공유 컴포넌트 (ErrorBoundary, Spinner 등)
 │   └── ui/                # 기본 UI 컴포넌트 (Button, Input, Dialog 등)
+├── contexts/               # React Context: 워크플로우 상태 관리
 ├── lib/                    # 유틸리티 및 핵심 로직
 │   ├── supabase/          # Supabase 클라이언트 (client/server)
 │   ├── ai/                # OpenAI 통합 및 프롬프트
@@ -510,25 +484,18 @@ english-test-ai/
 │   ├── utils/             # 일반 유틸리티
 │   └── constants/         # 상수 및 열거형
 ├── hooks/                  # 커스텀 React 훅
-│   ├── auth/              # 인증 훅
-│   ├── passages/          # 지문 데이터 훅
-│   ├── questions/         # 문제 생성 훅
-│   └── shared/            # 공유 훅 (toast, debounce)
 ├── types/                  # TypeScript 타입 정의
 ├── schemas/                # Zod 검증 스키마
-├── docs/                   # 문서
-│   ├── edited_project_blueprint.md
-│   ├── supabase_schema.sql
-│   └── vibe_coding_log.md
-└── middleware.ts           # Next.js 미들웨어 (인증 보호)
+├── scripts/                # 유틸리티 스크립트
+│   ├── test-openai.ts     # OpenAI API 테스트
+│   ├── test-title-autogen.ts # 타이틀 생성 테스트
+│   └── test-question-set-schema.ts # 스키마 검증 테스트
+└── docs/                   # 문서
 ```
 
 
-
-## 🔌 8. API 엔드포인트 (참고)
-
+## 🔌 8. API 엔드포인트
 ### 지문 관리
-
 - `POST /api/passages` - 새 지문 생성
 - `GET /api/passages` - 현재 사용자의 모든 지문 목록
 - `GET /api/passages/[id]` - 특정 지문 조회
@@ -536,13 +503,11 @@ english-test-ai/
 - `DELETE /api/passages/[id]` - 지문 삭제
 
 ### 문제 생성
-
 - `POST /api/generate` - OpenAI로 문제 생성
   - Body: `{ passageId, difficulty, questionCount, questionTypes }`
   - Returns: `{ questions: Question[] }`
 
 ### 문제 세트
-
 - `POST /api/question-sets` - 문제 세트 저장
 - `GET /api/question-sets` - 문제 세트 목록 (선택적 `?passageId=...` 필터)
 - `GET /api/question-sets/[id]` - 특정 문제 세트 조회
@@ -552,14 +517,12 @@ english-test-ai/
 
 ## 🚢 9. 배포
 
-EnglishTestAI는 Next.js를 만든 팀이 구축한 플랫폼인 [Vercel](https://vercel.com)에 배포하도록 설계되었습니다.
-
+EnglishTestAI는 [Vercel](https://vercel.com)에 배포하도록 설계되었습니다.
 **현재 프로덕션 URL**: [https://english-test-ai.vercel.app](https://english-test-ai.vercel.app)
 
 ### Vercel 배포 가이드
 
 #### 1단계: GitHub에 푸시
-
 ```bash
 git add .
 git commit -m "feat: initial deployment"
@@ -567,14 +530,12 @@ git push origin main
 ```
 
 #### 2단계: Vercel에 가져오기
-
 1. [vercel.com](https://vercel.com)으로 이동
 2. **"Add New Project"** 클릭
 3. GitHub 저장소 가져오기
 4. Vercel이 Next.js 설정 자동 감지
 
 #### 3단계: 환경 변수 구성
-
 Vercel 대시보드에서 **Project Settings** → **Environment Variables**로 이동하여 추가:
 
 ```
@@ -586,7 +547,7 @@ NEXT_PUBLIC_SITE_URL=https://your-app.vercel.app
 
 #### 4단계: 배포
 
-**"Deploy"**를 클릭하면 Vercel이 앱을 빌드하고 배포합니다.
+**Deploy**를 클릭하면 Vercel이 앱을 빌드하고 배포합니다.
 
 #### 5단계: Supabase 리디렉션 URL 업데이트
 
@@ -633,37 +594,15 @@ Vercel이 자동으로 배포:
 
 ---
 
-## 🤝 기여
+## 💡 11. 향후 개선 계획
 
-이 프로젝트는 교육 목적의 미니 프로젝트 과제의 일환으로 제작되었습니다.
-
-기여, 이슈 및 기능 요청을 환영합니다!
-
-### 개발 워크플로우
-
-1. 저장소 포크
-2. 기능 브랜치 생성 (`git checkout -b feature/amazing-feature`)
-3. [Conventional Commits](https://www.conventionalcommits.org/)를 따라 변경 사항 커밋
-4. 브랜치에 푸시 (`git push origin feature/amazing-feature`)
-5. Pull Request 열기
+### Phase 4 (향후 개발)
+- [ ] Unit Test 추가 (Vitest)
+- [ ] E2E Test (Playwright)
+- [ ] GitHub Actions CI/CD
+- [ ] 문제 PDF 내보내기
+- [ ] 문제 템플릿 관리
+- [ ] 협업 기능 (문제 공유)
+- [ ] 통계 대시보드 (문제 생성 이력)
 
 ---
-
-## 📄 라이선스
-
-이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
-
----
-
-## 🙏 감사의 글
-
-- [Next.js](https://nextjs.org/) 및 [Supabase](https://supabase.com/)로 구축
-- [OpenAI](https://openai.com/) 기반 AI
-- [shadcn/ui](https://ui.shadcn.com/)에서 영감을 받은 UI 컴포넌트
-- [react-icons](https://react-icons.github.io/react-icons/)의 아이콘
-
----
-
-**🎓 영어 교사를 위해 제작**
-
-*Made with ❤️ for English Teachers*
