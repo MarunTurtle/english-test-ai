@@ -15,8 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { QUESTION_TYPES } from '@/lib/constants/question-types';
-import { DIFFICULTY_LEVELS } from '@/lib/constants/difficulty';
+import { QUESTION_TYPES, type QuestionType } from '@/lib/constants/question-types';
+import { DIFFICULTY_LEVELS, type QuestionDifficulty } from '@/lib/constants/difficulty';
 
 interface QuestionEditDialogProps {
   question: Question;
@@ -63,7 +63,7 @@ export function QuestionEditDialog({
               label="Question Type"
               value={formData.type}
               onChange={(e) =>
-                setFormData({ ...formData, type: e.target.value as any })
+                setFormData({ ...formData, type: e.target.value as QuestionType })
               }
               options={QUESTION_TYPES.map((type) => ({
                 value: type.value,
@@ -74,7 +74,7 @@ export function QuestionEditDialog({
               label="Difficulty"
               value={formData.difficulty}
               onChange={(e) =>
-                setFormData({ ...formData, difficulty: e.target.value as any })
+                setFormData({ ...formData, difficulty: e.target.value as QuestionDifficulty })
               }
               options={DIFFICULTY_LEVELS.map((level) => ({
                 value: level.value,

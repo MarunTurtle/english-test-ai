@@ -14,6 +14,7 @@ config({ path: resolve(__dirname, '../.env.local') });
 // Import OpenAI directly to avoid module-level initialization issue
 import OpenAI from 'openai';
 import { GENERATION_SYSTEM_PROMPT, buildGenerationUserPrompt } from '../lib/ai/prompts';
+import type { Question } from '../types/question';
 
 // Test passage
 const TEST_PASSAGE = `
@@ -106,7 +107,7 @@ async function testOpenAIConnection() {
     if (parsedJson.questions && Array.isArray(parsedJson.questions)) {
       console.log(`   - Total Questions: ${parsedJson.questions.length}\n`);
       
-      parsedJson.questions.forEach((q: any, index: number) => {
+      parsedJson.questions.forEach((q: Question, index: number) => {
         console.log(`   ━━━ Question ${index + 1} ━━━`);
         console.log(`   Type: ${q.type || 'N/A'} | Difficulty: ${q.difficulty || 'N/A'}`);
         console.log(`   Validation: ${q.validation_status || 'N/A'}${q.validation_note ? ` (${q.validation_note})` : ''}`);
@@ -120,7 +121,7 @@ async function testOpenAIConnection() {
         
         if (q.options && Array.isArray(q.options)) {
           console.log(`   Options:`);
-          q.options.forEach((opt: any, i: number) => {
+          q.options.forEach((opt: string, i: number) => {
             const isCorrect = i === q.correct_answer;
             const marker = isCorrect ? '✓' : ' ';
             console.log(`     ${marker} ${String.fromCharCode(65 + i)}. ${String(opt)}`);

@@ -110,7 +110,7 @@ export async function updatePassage(
 ): Promise<Passage> {
   const supabase = await createServerSupabaseClient();
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   
   if (data.content !== undefined) updateData.content = data.content;
   if (data.grade_level !== undefined) updateData.grade_level = data.grade_level;
