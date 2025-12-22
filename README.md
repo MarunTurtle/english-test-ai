@@ -598,12 +598,16 @@ Vercel이 자동으로 배포:
 ## 💡 11. 향후 개선 계획
 
 ### Phase 4 (향후 개발)
+- [ ] Questions table 정규화 (현재 JSONB → 개별 테이블)
 - [ ] 문제 PDF, Word(.docx), HWP 내보내기
+- [ ] Agent Framework 도입
+  - Question Generation Agent
+  - Validation Agent
+  - Evidence Extraction Agent
+  - 단, 현재 구현으로도 충분히 고품질
+  - 단일 응답 구조 대비 가성비 효과가 낮음
+  - 응답 속도 개선 전략이 필요
 - [ ] Unit Test 추가 (Vitest)
 - [ ] E2E Test (Playwright)
-- [ ] GitHub Actions CI/CD
-- [ ] Questions table 정규화 (현재 JSONB → 개별 테이블)
 - [ ] 통계 대시보드 (문제 생성 이력)
 - [ ] 협업 기능 (문제 공유)
-
----
