@@ -33,10 +33,10 @@ jobs:
       - name: Build project
         run: npm run build
         env:
-          # Mock environment variables for build
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # Mock environment variables for build (use dummy values if secrets are not set)
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy-anon-key' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'sk-dummy-key' }}
 
       - name: Check build output
         run: |
