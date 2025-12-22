@@ -8,15 +8,11 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 🌐 라이브 데모
-
-**배포 URL**: [https://english-test-ai.vercel.app](https://english-test-ai.vercel.app)
-
-Google 계정으로 로그인하여 완전한 기능을 체험해보세요.
+**🌐 라이브 데모**: [https://english-test-ai.vercel.app](https://english-test-ai.vercel.app)
 
 ---
 
-## 개요
+## 📖 1. 프로젝트 소개
 
 EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선시하는 교실용 AI 문항 생성기입니다. 시스템은 교사가 신뢰하고 검토하며 편집하고 최종 확정할 수 있는 결과물을 생성합니다.
 
@@ -32,27 +28,6 @@ EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선�
 - ESL/EFL 교육자
 - 교육 콘텐츠 제작자
 
----
-
-## 주요 기능
-
-### 구현된 기능
-
-- Google OAuth 인증
-- 지문 관리 (생성, 조회, 수정, 삭제)
-- AI 기반 문제 생성 (OpenAI GPT-4o-mini 사용)
-- 근거 기반 문제 생성 (모든 문제에 지문 인용구 포함)
-- 문제 검토 및 검증 (PASS/NEEDS_FIX 상태 및 상세 피드백)
-- 수동 문제 편집 (직관적인 대화 상자에서 편집 가능)
-- 개별 문제 재생성 (다른 문제에 영향 없이 단일 문제 재생성)
-- 문제 세트 관리 (완전한 문제 세트 저장, 로드, 삭제)
-- 문제 은행 (필터 기능이 있는 저장된 문제 세트 조회 및 관리)
-- 반응형 UI (Tailwind CSS로 구축된 현대적이고 접근 가능한 인터페이스)
-- 토스트 알림 (모든 작업에 대한 사용자 친화적 피드백)
-- 오류 처리 및 재시도 (재시도 메커니즘을 갖춘 강력한 오류 처리)
-- 로딩 상태 (스켈레톤 로더 및 스피너로 향상된 UX)
-- 확인 대화 상자 (삭제 등 중요한 작업에 대한 AlertDialog)
-
 ### 핵심 차별화 요소
 
 1. **근거 기반 검증**: 모든 생성된 문제에 지문의 직접 인용구가 근거로 포함됨
@@ -61,64 +36,156 @@ EnglishTestAI는 "AI 마법"보다 **교사 주도(Teacher Control)**를 우선�
 
 ---
 
-## 기술 스택
+## ✅ 2. 구현 기능 (필수 요건 체크리스트)
 
-### 프레임워크 및 언어
+### 핵심 기능
 
-- Next.js 14+ (App Router)
-- TypeScript (strict mode)
-- React 18+
+- ✅ **사용자 인증**
+  - Google OAuth 로그인/로그아웃
+  - 세션 관리 및 보안
+  - 사용자별 데이터 격리
 
-### UI 및 스타일링
+- ✅ **지문 관리 (CRUD)**
+  - 영어 지문 생성 및 저장
+  - 지문 목록 조회 (대시보드)
+  - 지문 상세 보기 및 수정
+  - 지문 삭제 (확인 대화 상자)
+  - AI 기반 제목 자동 생성
 
-- Tailwind CSS
-- react-icons
-- 커스텀 컴포넌트 (shadcn 스타일)
+- ✅ **AI 문제 생성**
+  - OpenAI GPT-4o-mini 통합
+  - 다양한 설정 옵션:
+    - 학년 선택 (중1, 중2, 중3)
+    - 난이도 선택 (쉬움, 보통, 어려움)
+    - 문제 수 선택 (5~10개)
+    - 문제 유형 선택 (주제, 세부사항, 추론, 어휘)
+  - 구조화된 JSON 출력 (Zod 검증)
+  - 근거 인용구 자동 추출
 
-### 백엔드 및 데이터베이스
+- ✅ **문제 검토 및 편집**
+  - 생성된 문제 미리보기
+  - 근거 인용구 표시
+  - 검증 상태 (PASS/NEEDS_FIX) 및 피드백
+  - 개별 문제 수동 편집
+  - 개별 문제 재생성 (AI 기반)
 
-- Supabase (PostgreSQL + 인증)
-- Row Level Security (RLS)
-- Supabase Auth (Google OAuth)
+- ✅ **문제 세트 관리**
+  - 문제 세트 저장 (JSONB 형식)
+  - 문제 세트 목록 조회
+  - 문제 세트 상세 보기
+  - 문제 세트 삭제
+  - 지문별 문제 세트 필터링
 
-### AI 통합
+- ✅ **문제 은행**
+  - 저장된 모든 문제 세트 조회
+  - 다중 필터 기능:
+    - 학년별 필터
+    - 난이도별 필터
+    - 문제 유형별 필터
+  - 문제 세트 메타데이터 표시
+  - 빠른 조회 및 삭제
 
-- OpenAI API (GPT-4o-mini)
-- 구조화된 JSON 출력
-- Zod (런타임 스키마 검증)
+- ✅ **UI/UX**
+  - 반응형 디자인 (모바일, 태블릿, 데스크톱)
+  - 사이드바 네비게이션
+  - 토스트 알림 시스템
+  - 로딩 상태 (스켈레톤, 스피너)
+  - 오류 경계 (Error Boundary)
+  - 빈 상태 (Empty State) 컴포넌트
+  - 확인 대화 상자 (중요 작업)
 
-### 배포
+- ✅ **데이터베이스**
+  - Supabase PostgreSQL
+  - Row Level Security (RLS)
+  - 사용자별 데이터 보안
+  - 효율적인 쿼리 및 인덱싱
 
-- Vercel
+- ✅ **배포 및 운영**
+  - Vercel 배포 완료
+  - 환경 변수 관리
+  - 프로덕션 최적화
+  - CI/CD 자동화
 
 ---
 
-## 사전 요구사항
+## 🛠️ 3. 기술 스택
+
+### 프레임워크 및 언어
+
+- **Next.js 16.1** - App Router, Server Components, API Routes
+- **TypeScript 5.0** - 타입 안정성 및 개발자 경험 향상
+- **React 19** - 최신 React 기능 활용
+
+### UI 및 스타일링
+
+- **Tailwind CSS 4** - 유틸리티 우선 CSS 프레임워크
+- **react-icons** - 아이콘 라이브러리
+- **커스텀 컴포넌트** - shadcn/ui 스타일 컴포넌트 시스템
+
+### 백엔드 및 데이터베이스
+
+- **Supabase** - PostgreSQL 데이터베이스 + 인증
+- **Row Level Security (RLS)** - 데이터 보안 및 격리
+- **Supabase Auth** - Google OAuth 통합
+
+### AI 통합
+
+- **OpenAI API** - GPT-4o-mini 모델
+- **구조화된 출력** - JSON 기반 응답 파싱
+- **Zod** - 런타임 스키마 검증 및 타입 안전성
+
+### 배포 및 호스팅
+
+- **Vercel** - 서버리스 배포 플랫폼
+- **Edge Functions** - 빠른 API 응답
+
+### 아키텍처 개요
+
+```
+┌─────────────────┐
+│   Next.js App   │
+│   (Frontend)    │
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    │         │
+┌───▼────┐ ┌──▼──────┐
+│Supabase│ │ OpenAI  │
+│  (DB)  │ │  (AI)   │
+└────────┘ └─────────┘
+```
+
+- **클라이언트**: React 컴포넌트, 커스텀 훅, 상태 관리
+- **API 레이어**: Next.js API Routes (서버 사이드)
+- **데이터베이스**: Supabase PostgreSQL (RLS 적용)
+- **AI 서비스**: OpenAI API (문제 생성)
+
+---
+
+## 🚀 4. 로컬 실행 방법
 
 ### 시스템 요구사항
 
-- Node.js 18.x 이상
-- npm 또는 yarn 또는 pnpm
-- Git
+- **Node.js 18.x 이상**
+- **npm** / yarn / pnpm
+- **Git**
 
 ### 필요한 계정
 
 1. **Supabase 계정** - [supabase.com에서 가입](https://supabase.com)
 2. **OpenAI API 키** - [platform.openai.com에서 발급](https://platform.openai.com/api-keys)
-3. **Google OAuth 인증** - Supabase Auth 설정에서 구성
+3. **Google OAuth** - Supabase Auth 설정에서 구성
 
----
+### 설치 및 실행
 
-## 시작하기
-
-### 1. 저장소 복제
+#### 1. 저장소 복제
 
 ```bash
 git clone https://github.com/[your-username]/english-test-ai.git
 cd english-test-ai
 ```
 
-### 2. 의존성 설치
+#### 2. 의존성 설치
 
 ```bash
 npm install
@@ -128,119 +195,290 @@ yarn install
 pnpm install
 ```
 
-### 3. 환경 변수 설정
+#### 3. 환경 변수 설정
 
-`.env.example`을 `.env.local`로 복사:
+프로젝트 루트에 `.env.local` 파일을 생성하고 다음 내용을 추가:
 
 ```bash
-cp .env.example .env.local
+# Supabase 설정
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# OpenAI 설정
+OPENAI_API_KEY=sk-your-openai-api-key-here
+
+# Site URL (선택 사항)
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-그런 다음 `.env.local`의 값을 채웁니다. 자세한 내용은 아래 [환경 변수](#환경-변수) 섹션을 참조하세요.
+**환경 변수 발급 방법:**
 
-### 4. Supabase 설정
+1. **Supabase 인증 정보**
+   - [supabase.com](https://supabase.com)에서 프로젝트 생성
+   - Settings → API → Project URL → `NEXT_PUBLIC_SUPABASE_URL`
+   - Settings → API → anon/public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-#### Supabase 프로젝트 생성
+2. **OpenAI API 키**
+   - [platform.openai.com/api-keys](https://platform.openai.com/api-keys)에서 발급
+   - `OPENAI_API_KEY`에 복사
 
-1. [supabase.com](https://supabase.com)으로 이동하여 새 프로젝트 생성
-2. 프로젝트 설정이 완료될 때까지 대기
 
-#### 데이터베이스 스키마 실행
+#### 4. Supabase 데이터베이스 설정
 
-1. Supabase 대시보드의 SQL Editor로 이동
-2. 이 저장소의 `docs/supabase_schema.sql` 파일 열기
-3. SQL을 편집기에 복사하여 붙여넣기
-4. SQL을 실행하여 모든 테이블 및 정책 생성
+**데이터베이스 스키마 실행:**
 
-#### Google OAuth 활성화
+1. Supabase 대시보드의 **SQL Editor**로 이동
+2. 이 저장소의 `docs/supabase_schema.sql` 파일 내용 복사
+3. SQL 편집기에 붙여넣고 **RUN** 클릭
+4. 모든 테이블, RLS 정책, 트리거가 생성됨
 
-1. Supabase 대시보드에서 **Authentication** → **Providers**로 이동
-2. **Google** 제공자 활성화
-3. 승인된 리디렉션 URL 추가:
-   - 로컬: `http://localhost:3000/auth/callback`
-   - 프로덕션: `https://your-app.vercel.app/auth/callback`
+**Google OAuth 활성화:**
 
-#### 인증 정보 복사
+1. Supabase 대시보드 → **Authentication** → **Providers**
+2. **Google** 활성화
+3. Redirect URL 추가: `http://localhost:3000/auth/callback`
 
-1. Supabase 대시보드에서 **Settings** → **API**로 이동
-2. 다음 값을 `.env.local`에 복사:
-   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon/public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+자세한 데이터베이스 구조는 아래 [5. 데이터베이스 스키마](#-5-데이터베이스-스키마) 섹션 참조
 
-### 5. OpenAI API 키 발급
-
-1. [platform.openai.com/api-keys](https://platform.openai.com/api-keys)로 이동
-2. 새 API 키 생성
-3. `.env.local`의 `OPENAI_API_KEY`에 복사
-
-### 6. 개발 서버 실행
+#### 5. 개발 서버 실행
 
 ```bash
 npm run dev
-# 또는
-yarn dev
-# 또는
-pnpm dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 엽니다.
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 앱 확인
+
+### 기타 명령어
+
+```bash
+# 프로덕션 빌드
+npm run build
+
+# 프로덕션 서버 실행
+npm start
+
+# 린트 검사
+npm run lint
+
+# OpenAI 통합 테스트
+npm run test:openai
+
+# 제목 자동 생성 테스트
+npm run test:title
+```
 
 ---
 
-## 환경 변수
+## 💾 5. 데이터베이스 스키마
 
-루트 디렉터리에 `.env.local` 파일을 생성하고 다음 변수를 설정합니다:
+EnglishTestAI는 Supabase (PostgreSQL)를 사용하며, 다음과 같은 테이블 구조를 가집니다.
 
-### Supabase 설정
+### 테이블 구조
 
-```bash
-# Supabase 프로젝트 URL
-# 찾는 위치: Supabase 대시보드 → Settings → API → Project URL
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+#### 1. `profiles` - 사용자 프로필
 
-# Supabase Anon/Public 키 (클라이언트에 노출해도 안전)
-# 찾는 위치: Supabase 대시보드 → Settings → API → Project API keys → anon public
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+```sql
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id),
+  email TEXT UNIQUE NOT NULL,
+  full_name TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
-### OpenAI 설정
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| `id` | UUID | 사용자 ID (Supabase Auth와 연동) |
+| `email` | TEXT | 사용자 이메일 (Google OAuth) |
+| `full_name` | TEXT | 사용자 이름 |
+| `created_at` | TIMESTAMPTZ | 생성 시각 |
+| `updated_at` | TIMESTAMPTZ | 수정 시각 |
 
-```bash
-# OpenAI API 키 (서버 측 전용, 절대 클라이언트에 노출하지 마세요)
-# 발급: https://platform.openai.com/api-keys
-OPENAI_API_KEY=sk-your-openai-api-key-here
+#### 2. `passages` - 영어 지문
+
+```sql
+CREATE TABLE passages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id),
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  grade_level TEXT NOT NULL CHECK (grade_level IN ('중1', '중2', '중3')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
-### 선택 사항: Site URL
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| `id` | UUID | 지문 고유 ID |
+| `user_id` | UUID | 작성자 ID |
+| `title` | TEXT | 지문 제목 (AI 자동 생성) |
+| `content` | TEXT | 영어 지문 본문 |
+| `grade_level` | TEXT | 학년 (중1, 중2, 중3) |
+| `created_at` | TIMESTAMPTZ | 생성 시각 |
+| `updated_at` | TIMESTAMPTZ | 수정 시각 |
 
-```bash
-# Next.js Site URL
-# 로컬 개발:
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+#### 3. `question_sets` - 문제 세트
 
-# 프로덕션 (Vercel 배포 후 업데이트):
-# NEXT_PUBLIC_SITE_URL=https://your-app.vercel.app
+```sql
+CREATE TABLE question_sets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id),
+  passage_id UUID NOT NULL REFERENCES passages(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  difficulty TEXT NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard')),
+  grade_level TEXT NOT NULL CHECK (grade_level IN ('중1', '중2', '중3')),
+  question_count INTEGER NOT NULL,
+  question_types TEXT[] NOT NULL,
+  questions JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
-### 선택 사항: Supabase Service Role 키
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| `id` | UUID | 문제 세트 고유 ID |
+| `user_id` | UUID | 작성자 ID |
+| `passage_id` | UUID | 연결된 지문 ID |
+| `title` | TEXT | 문제 세트 제목 |
+| `difficulty` | TEXT | 난이도 (easy, medium, hard) |
+| `grade_level` | TEXT | 학년 (중1, 중2, 중3) |
+| `question_count` | INTEGER | 문제 개수 |
+| `question_types` | TEXT[] | 문제 유형 배열 |
+| `questions` | JSONB | 문제 데이터 (JSON 형식) |
+| `created_at` | TIMESTAMPTZ | 생성 시각 |
 
-```bash
-# 서버 측 관리자 작업에만 필요
-# 절대 클라이언트에 이 키를 노출하지 마세요!
-# 찾는 위치: Supabase 대시보드 → Settings → API → Project API keys → service_role
-# SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+### ERD (Entity Relationship Diagram)
+
+```
+┌─────────────┐
+│  profiles   │
+│─────────────│
+│ id (PK)     │
+│ email       │
+│ full_name   │
+└──────┬──────┘
+       │
+       │ 1:N
+       │
+┌──────▼──────┐
+│  passages   │
+│─────────────│
+│ id (PK)     │
+│ user_id(FK) │
+│ title       │
+│ content     │
+│ grade_level │
+└──────┬──────┘
+       │
+       │ 1:N
+       │
+┌──────▼──────────┐
+│ question_sets   │
+│─────────────────│
+│ id (PK)         │
+│ user_id (FK)    │
+│ passage_id (FK) │
+│ questions(JSONB)│
+│ difficulty      │
+└─────────────────┘
 ```
 
-**중요 참고 사항:**
+### Row Level Security (RLS) 정책
 
-- `.env.local`을 버전 관리에 커밋하지 마세요
-- `NEXT_PUBLIC_*` 변수는 브라우저에 노출됩니다 (anon 키만 안전)
-- `OPENAI_API_KEY`는 서버 측 전용이며 클라이언트로 전송되지 않습니다
-- 모든 변수가 포함된 템플릿은 `.env.example`을 참조하세요
+모든 테이블에 RLS가 활성화되어 있으며, 사용자는 **자신의 데이터만** 접근 가능합니다.
+
+**주요 정책:**
+
+```sql
+-- 사용자는 자신의 지문만 조회 가능
+CREATE POLICY "Users can view own passages"
+ON passages FOR SELECT
+USING (auth.uid() = user_id);
+
+-- 사용자는 자신의 지문만 생성 가능
+CREATE POLICY "Users can create own passages"
+ON passages FOR INSERT
+WITH CHECK (auth.uid() = user_id);
+
+-- 동일한 정책이 question_sets에도 적용됨
+```
+
+### 인덱스
+
+성능 최적화를 위한 인덱스:
+
+```sql
+CREATE INDEX idx_passages_user_id ON passages(user_id);
+CREATE INDEX idx_question_sets_user_id ON question_sets(user_id);
+CREATE INDEX idx_question_sets_passage_id ON question_sets(passage_id);
+```
+
+전체 스키마 SQL 파일: [`docs/supabase_schema.sql`](docs/supabase_schema.sql)
 
 ---
 
-## 프로젝트 구조
+---
+
+## 📖 6. 사용 방법
+
+### 1. 로그인
+
+1. 랜딩 페이지로 이동
+2. "Google로 로그인" 클릭
+3. Google 계정으로 인증
+4. 대시보드로 리디렉션됨
+
+### 2. 지문 생성
+
+1. **대시보드**로 이동
+2. **"새 지문 만들기"** 클릭
+3. 영어 독해 지문 붙여넣기 (최소 100자)
+4. **학년 선택**: 중1, 중2, 또는 중3
+5. **"지문 생성"** 클릭
+6. 제목은 지문 내용에서 자동 생성됨
+
+### 3. 문제 생성
+
+1. 대시보드에서 지문을 클릭하여 열기
+2. 생성 설정 구성:
+   - **난이도**: 쉬움, 보통, 어려움
+   - **문제 수**: 5~10문제
+   - **문제 유형**: 주제, 세부사항, 추론, 어휘 (다중 선택 가능)
+3. **"문제 세트 생성"** 클릭
+4. AI가 문제를 생성할 때까지 대기 (보통 10~30초)
+
+### 4. 문제 검토 및 편집
+
+각 생성된 문제에는 다음이 포함됩니다:
+- 문제 텍스트
+- 4개의 객관식 선택지
+- 정답
+- 지문의 근거 인용구
+- 검증 상태 (PASS / NEEDS_FIX)
+
+**수행 가능한 작업:**
+
+- **수동 편집**: "편집"을 클릭하여 필드 수정
+- **재생성**: "재생성"을 클릭하여 단일 문제의 새 버전 생성
+- **검토 상태**: 문제가 검증을 통과했는지 수정이 필요한지 확인
+- **저장**: 모든 문제에 만족하면 "문제 세트 저장" 클릭
+
+### 5. 문제 은행 관리
+
+1. 사이드바에서 **"문제 은행"**으로 이동
+2. 저장된 모든 문제 세트 조회
+3. 필터링:
+   - 학년 (중1, 중2, 중3)
+   - 난이도 (쉬움, 보통, 어려움)
+   - 문제 유형
+4. 문제 세트 **조회**하여 세부 정보 확인
+5. 더 이상 필요 없는 문제 세트 **삭제**
+
+---
+
+## 📁 7. 프로젝트 구조
 
 ```
 english-test-ai/
@@ -285,88 +523,11 @@ english-test-ai/
 └── middleware.ts           # Next.js 미들웨어 (인증 보호)
 ```
 
----
 
-## 사용 방법
 
-### 1. 로그인
+## 🔌 8. API 엔드포인트 (참고)
 
-1. 랜딩 페이지로 이동
-2. "Google로 로그인" 클릭
-3. Google 계정으로 인증
-4. 대시보드로 리디렉션됨
-
-### 2. 지문 생성
-
-1. **대시보드**로 이동
-2. **"새 지문 만들기"** 클릭
-3. 영어 독해 지문 붙여넣기 (최소 100자)
-4. **학년 선택**: 중1, 중2, 또는 중3
-5. **"지문 생성"** 클릭
-6. 제목은 지문 내용에서 자동 생성됨
-
-### 3. 문제 생성
-
-1. 대시보드에서 지문을 클릭하여 열기
-2. 생성 설정 구성:
-   - **난이도**: 쉬움, 보통, 어려움
-   - **문제 수**: 5~10문제
-   - **문제 유형**: 주제, 세부사항, 추론, 어휘 (다중 선택 가능)
-3. **"문제 세트 생성"** 클릭
-4. AI가 문제를 생성할 때까지 대기 (보통 10~30초)
-
-### 4. 문제 검토 및 편집
-
-각 생성된 문제에는 다음이 포함됩니다:
-- 문제 텍스트
-- 4개의 객관식 선택지
-- 정답
-- 지문의 근거 인용구
-- 검증 상태 (PASS / NEEDS_FIX)
-
-**수행 가능한 작업:**
-
-- 수동 편집: "편집"을 클릭하여 필드 수정
-- 재생성: "재생성"을 클릭하여 단일 문제의 새 버전 생성
-- 검토 상태: 문제가 검증을 통과했는지 수정이 필요한지 확인
-- 저장: 모든 문제에 만족하면 "문제 세트 저장" 클릭
-
-### 5. 문제 은행 관리
-
-1. 사이드바에서 **"문제 은행"**으로 이동
-2. 저장된 모든 문제 세트 조회
-3. 필터링:
-   - 학년 (중1, 중2, 중3)
-   - 난이도 (쉬움, 보통, 어려움)
-   - 문제 유형
-4. 문제 세트 **조회**하여 세부 정보 확인
-5. 더 이상 필요 없는 문제 세트 **삭제**
-
----
-
-## 데이터베이스 스키마
-
-EnglishTestAI는 다음 테이블이 있는 Supabase(PostgreSQL)를 사용합니다:
-
-### 테이블
-
-- **`profiles`**: 사용자 정보 (Supabase Auth와 연결)
-- **`passages`**: 교사가 생성한 독해 지문
-- **`question_sets`**: 생성된 문제 세트 (JSONB 페이로드로 저장)
-
-### 보안
-
-- 모든 테이블에 **Row Level Security (RLS)** 활성화
-- 사용자는 자신의 데이터에만 접근 가능
-- 정책이 모든 작업에 대해 user_id 검사 시행
-
-전체 스키마 및 RLS 정책은 `docs/supabase_schema.sql`을 참조하세요.
-
----
-
-## API 엔드포인트
-
-### 지문
+### 지문 관리
 
 - `POST /api/passages` - 새 지문 생성
 - `GET /api/passages` - 현재 사용자의 모든 지문 목록
@@ -389,54 +550,13 @@ EnglishTestAI는 다음 테이블이 있는 Supabase(PostgreSQL)를 사용합니
 
 ---
 
-## 개발
-
-### 개발 서버 실행
-
-```bash
-npm run dev
-```
-
-[http://localhost:3000](http://localhost:3000)에서 개발 서버 시작
-
-### 프로덕션 빌드
-
-```bash
-npm run build
-```
-
-최적화된 프로덕션 빌드 생성
-
-### 프로덕션 빌드 로컬 실행
-
-```bash
-npm run build
-npm start
-```
-
-### 린팅
-
-```bash
-npm run lint
-```
-
-### 테스트 스크립트
-
-```bash
-# OpenAI 통합 테스트
-npm run test:openai
-
-# 제목 자동 생성 테스트
-npm run test:title
-```
-
----
-
-## 배포
-
-### Vercel에 배포
+## 🚢 9. 배포
 
 EnglishTestAI는 Next.js를 만든 팀이 구축한 플랫폼인 [Vercel](https://vercel.com)에 배포하도록 설계되었습니다.
+
+**현재 프로덕션 URL**: [https://english-test-ai.vercel.app](https://english-test-ai.vercel.app)
+
+### Vercel 배포 가이드
 
 #### 1단계: GitHub에 푸시
 
@@ -493,14 +613,16 @@ Vercel이 자동으로 배포:
 
 ---
 
-## 문서
+## 📚 10. 추가 문서
 
 ### 프로젝트 문서
 
-- **`docs/edited_project_blueprint.md`** - 완전한 프로젝트 요구사항 및 사양
-- **`docs/project_structure.md`** - 상세한 프로젝트 구조 가이드
-- **`docs/supabase_schema.sql`** - 데이터베이스 스키마 및 RLS 정책
-- **`docs/vibe_coding_log.md`** - 개발 로그 (RFQ 요구사항)
+- [`docs/edited_project_blueprint.md`](docs/edited_project_blueprint.md) - 프로젝트 요구사항 및 사양
+- [`docs/project_structure.md`](docs/project_structure.md) - 상세한 프로젝트 구조 가이드
+- [`docs/supabase_schema.sql`](docs/supabase_schema.sql) - 데이터베이스 스키마 및 RLS 정책
+- [`docs/vibe_coding_log.md`](docs/vibe_coding_log.md) - 개발 로그 (Vibe Coding)
+- [`FINAL_CHECKLIST.md`](FINAL_CHECKLIST.md) - 최종 체크리스트
+- [`SUBMISSION.md`](SUBMISSION.md) - 제출 문서
 
 ### 외부 리소스
 
@@ -511,7 +633,7 @@ Vercel이 자동으로 배포:
 
 ---
 
-## 기여
+## 🤝 기여
 
 이 프로젝트는 교육 목적의 미니 프로젝트 과제의 일환으로 제작되었습니다.
 
@@ -527,13 +649,13 @@ Vercel이 자동으로 배포:
 
 ---
 
-## 라이선스
+## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
 ---
 
-## 감사의 글
+## 🙏 감사의 글
 
 - [Next.js](https://nextjs.org/) 및 [Supabase](https://supabase.com/)로 구축
 - [OpenAI](https://openai.com/) 기반 AI
@@ -542,13 +664,6 @@ Vercel이 자동으로 배포:
 
 ---
 
-## 연락처 및 지원
+**🎓 영어 교사를 위해 제작**
 
-질문, 제안 또는 이슈가 있는 경우:
-
-- GitHub에서 이슈 열기
-- 개발팀에 문의
-
----
-
-**영어 교사를 위해 제작**
+*Made with ❤️ for English Teachers*
