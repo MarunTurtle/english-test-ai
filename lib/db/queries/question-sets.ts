@@ -101,6 +101,35 @@ export async function createQuestionSet(
 }
 
 /**
+ * Update a question set
+ * @param id - The question set ID
+ * @param data - Partial question set data to update
+ * @param userId - The user's ID (for RLS check)
+ * @returns The updated question set
+ */
+export async function updateQuestionSet(
+  id: string,
+  data: Partial<Omit<CreateQuestionSetInput, 'passage_id'>>,
+  userId: string
+): Promise<QuestionSet> {
+  const supabase = await createServerSupabaseClient();
+
+  const { data: questionSet, error } = await supabase
+    .from('question_sets')
+    .update(data)
+    .eq('id', id)
+    .eq('user_id', userId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to update question set: ${error.message}`);
+  }
+
+  return questionSet as QuestionSet;
+}
+
+/**
  * Delete a question set
  * @param id - The question set ID
  * @param userId - The user's ID (for RLS check)
