@@ -25,8 +25,8 @@ export default function PassageDetailPage() {
   const passageId = params?.id as string;
   const questionSetId = searchParams.get('questionSetId');
   const { passage, loading, error } = usePassage(passageId);
-  const { generateQuestions, isGenerating, error: generateError } = useGenerateQuestions();
-  const { saveQuestionSet, loading: isSaving, error: saveError } = useSaveQuestionSet();
+  const { generateQuestions, isGenerating } = useGenerateQuestions();
+  const { saveQuestionSet, loading: isSaving } = useSaveQuestionSet();
 
   // Workflow state
   const [phase, setPhase] = useState<WorkflowPhase>('input');

@@ -1,6 +1,5 @@
 'use client';
 
-import { ReactNode } from 'react';
 import { MdWarning, MdClose } from 'react-icons/md';
 
 interface AlertDialogProps {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import type { GenerationSettings } from '@/types/question';
 import { DIFFICULTY_LEVELS } from '@/lib/constants/difficulty';
 import { QUESTION_TYPES } from '@/lib/constants/question-types';

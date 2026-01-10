@@ -20,14 +20,14 @@ export async function GET(request: Request) {
           set(name: string, value: string, options: CookieOptions) {
             try {
               cookieStore.set({ name, value, ...options })
-            } catch (error) {
+            } catch {
               // Handle cookie setting errors in server components
             }
           },
           remove(name: string, options: CookieOptions) {
             try {
               cookieStore.set({ name, value: '', ...options })
-            } catch (error) {
+            } catch {
               // Handle cookie removal errors in server components
             }
           },

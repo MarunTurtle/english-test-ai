@@ -48,6 +48,7 @@ export function usePassage(id: string | null): UsePassageReturn {
 
   useEffect(() => {
     fetchPassage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return {

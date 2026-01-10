@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { CreatePassageInput, Passage } from '@/types/passage';
 import { parseApiError, getUserFriendlyMessage } from '@/lib/utils/error-handler';
 
@@ -19,7 +18,6 @@ export function useCreatePassage(): UseCreatePassageReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastData, setLastData] = useState<CreatePassageInput | null>(null);
-  const router = useRouter();
 
   const createPassage = async (data: CreatePassageInput): Promise<Passage | null> => {
     try {
