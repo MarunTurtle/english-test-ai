@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { UpdatePassageInput, Passage } from '@/types/passage';
 
 interface UseUpdatePassageReturn {
@@ -16,7 +15,6 @@ interface UseUpdatePassageReturn {
 export function useUpdatePassage(): UseUpdatePassageReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const updatePassage = async (id: string, data: UpdatePassageInput): Promise<Passage | null> => {
     try {

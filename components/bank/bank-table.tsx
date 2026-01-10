@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuestionSets } from '@/hooks/questions/use-question-sets';
-import { EmptyState } from '@/components/shared/empty-state';
 import { SkeletonLoader } from '@/components/shared/skeleton-loader';
 import { AlertDialog } from '@/components/ui/alert-dialog';
 import { FiDatabase, FiEdit2, FiTrash2 } from 'react-icons/fi';

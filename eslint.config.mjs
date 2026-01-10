@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Documentation and prototype files
     "docs/prototype_code.tsx",
+    "vibe-coding-log/**",
   ]),
 ]);
 
